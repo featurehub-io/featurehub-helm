@@ -1,8 +1,0 @@
-= Postgres All-In-One - Low Volume Option
-
-This is an example of the https://docs.featurehub.io/featurehub/latest/installation.html#_option_1b_low_volume_deployment_non_streaming[low volume option] talking to a Postgres database. Most Cloud providers allow you to
-deploy single containers and this will let you do that.
-
-Beware that because all Edge traffic routes to the same container as your Admin application, excess Edge
-traffic will cause performance issues with your Admin app.
-
