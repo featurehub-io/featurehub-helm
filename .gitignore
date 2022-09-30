@@ -79,3 +79,6 @@ released-pom.xml
 node-js
 
 .DS_Store
+
+helm/gen_templates
+helm/featurehub/charts

@@ -12,4 +12,10 @@ data:
   monitor.port: "8701"
   server.port: "8085"
   run.nginx: "true"
+  {{- if .Values.global.intranet }}
+  web.asset.location: "/var/www/html/intranet"
+  {{- end }}
+  {{- if ne .Values.global.urlPath "" }}
+  featurehub.url-path: {{ .Values.global.urlPath | quote }}
+  {{- end }}
 {{- end }}

@@ -132,3 +132,30 @@ Create the name of the service account to use (dacha)
 {{- default "default" .Values.dacha.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*This allows us to have an override location*/}}
+{{- define "featurehub.liveness.url" -}}
+{{- if ne .Values.global.urlPath "" }}
+{{- printf "%s/%s" .Values.global.urlPath "health/liveness" }}
+{{- else -}}
+/health/liveness
+{{- end }}
+{{- end }}
+
+{{/*This allows us to have an override location*/}}
+{{- define "featurehub.readiness.url" -}}
+{{- if ne .Values.global.urlPath "" }}
+{{- printf "%s/%s" .Values.global.urlPath "health/readiness" }}
+{{- else -}}
+/health/readiness
+{{- end }}
+{{- end }}
+
+{{/*This allows us to have an override location*/}}
+{{- define "featurehub.metrics.url" -}}
+{{- if ne .Values.global.urlPath "" }}
+{{- printf "%s/%s" .Values.global.urlPath "metrics" }}
+{{- else -}}
+/metrics
+{{- end }}
+{{- end }}
