@@ -82,7 +82,7 @@ spec:
             failureThreshold: 2
             timeoutSeconds: 3
             httpGet:
-              path: /health/liveness
+              path: {{ include "featurehub.liveness.url" . | quote }}
               port: metrics
           readinessProbe:
             initialDelaySeconds: 20
@@ -91,12 +91,12 @@ spec:
             failureThreshold: 2
             timeoutSeconds: 3
             httpGet:
-              path: /health/readiness
+              path: {{ include "featurehub.readiness.url" . | quote }}
               port: metrics
           volumeMounts:
           {{- if gt ( len .Values.global.extraCommonConfigFiles ) 0 -}}
           {{- range $cm := .Values.global.extraCommonConfigFiles }}
-            - name: {{ $cm.configMapSuffix }} 
+            - name: {{ $cm.configMapSuffix }}
               mountPath: "/etc/common-config/{{ $cm.fileName }}"
               subPath: {{ $cm.fileName | quote }}
           {{- end }}

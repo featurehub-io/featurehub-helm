@@ -1,0 +1,11 @@
+
+pullPolicy: IfNotPresent
+securityPolicy: { }
+podSecurityPolicy: { }
+
+global:
+#  urlPath: "/foo/featurehub"
+  intranet: true
+
+#managementRepository:
+#  initContainers:

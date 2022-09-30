@@ -46,12 +46,20 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "featurehub.managementRepository.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.managementRepository.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ include "featurehub.managementRepository.name" . }}
+          {{- with .Values.securityContext }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           image: "{{ .Values.managementRepository.image.repository }}:{{ .Values.managementRepository.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.pullPolicy }}
           {{- if or (.Values.global.environmentVars) (.Values.managementRepository.environmentVars) (.Values.managementRepository.envFromSecret) }}
@@ -82,7 +90,7 @@ spec:
             failureThreshold: 2
             timeoutSeconds: 3
             httpGet:
-              path: /health/liveness
+              path: {{ include "featurehub.liveness.url" . | quote }}
               port: metrics
           readinessProbe:
             initialDelaySeconds: 20
@@ -91,7 +99,7 @@ spec:
             failureThreshold: 2
             timeoutSeconds: 3
             httpGet:
-              path: /health/readiness
+              path: {{ include "featurehub.readiness.url" . | quote }}
               port: metrics
           volumeMounts:
           {{- if gt ( len .Values.global.extraCommonConfigFiles ) 0 -}}

@@ -4,7 +4,16 @@
 nameOverride: ""
 fullnameOverride: ""
 
+# global sections are normally reserved for cross application configuration, where multiple apps are in the repository,
+# we should generally not use this section
 global:
+  # -- the default url path is to mount as root, this lets you mount where ever you like, but it affects the health checks
+  urlPath: ""
+
+  # -- if set to true, then MR will serve the intranet version of the application which does not require external
+  # HTML dependencies
+  intranet: false
+
   # -- Environment variables to be exposed to Management Repository, Edge and Dacha deployments.
   # As of 1.5.0 all FeatureHub controller properties are available as environment variables using the same case.
   # Entries accepted here are the same as would be specified in /etc/app-config/common.properties.
@@ -123,6 +132,8 @@ managementRepository:
   tolerations: []
 
   affinity: {}
+
+  initContainers: {}
 
   # -- Environment variables to be exposed to management-repository deployment.
   # As of 1.5.0 all FeatureHub controller properties are available as environment variables using the same case.

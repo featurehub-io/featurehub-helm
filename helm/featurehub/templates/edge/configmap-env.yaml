@@ -11,4 +11,7 @@ data:
 {{- end }}
   monitor.port: "8701"
   server.port: "8553"
+  {{- if ne .Values.global.urlPath "" }}
+  featurehub.url-path: {{ .Values.global.urlPath | quote }}
+  {{- end }}
 {{- end }}
