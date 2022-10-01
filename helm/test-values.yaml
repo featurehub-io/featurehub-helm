@@ -4,6 +4,8 @@ securityPolicy: { }
 podSecurityPolicy: { }
 
 global:
+  knative:
+    enabled: true
 #  urlPath: "/foo/featurehub"
   intranet: true
 

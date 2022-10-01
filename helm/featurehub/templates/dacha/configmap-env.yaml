@@ -9,6 +9,15 @@ data:
 {{- with .Values.dacha.environmentVars }}
   {{- toYaml . | nindent 2 }}
 {{- end }}
+{{- if .Values.global.knative }}
+  # use the public port
+  management-repository.url: http://featurehub-management-server:8085
+{{- else }}
+  # use the monitor port
+  management-repository.url: http://featurehub-management-server:8701
+{{- end }}
+{{- if not .Values.global.knative }}
   monitor.port: "8701"
+{{- end }}
   server.port: "8600"
 {{- end }}

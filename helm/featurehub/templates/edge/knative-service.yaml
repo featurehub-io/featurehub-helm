@@ -1,19 +1,11 @@
-{{- if and .Values.edge.enabled ( not .Values.global.knative.enabled ) }}
-apiVersion: apps/v1
-kind: Deployment
+{{- if and .Values.edge.enabled .Values.global.knative.enabled }}
+apiVersion: serving.knative.dev/v1
+kind: Service
 metadata:
   name: {{ include "featurehub.edge.name" . }}
   labels:
     {{- include "featurehub.edge.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.edge.replicaCount }}
-  {{- with .Values.edge.strategy }}
-  strategy:
-    {{- . | toYaml | nindent 4 }}
-  {{- end }}
-  selector:
-    matchLabels:
-      {{- include "featurehub.edge.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
@@ -46,8 +38,6 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "featurehub.edge.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ include "featurehub.edge.name" . }}
           {{- with .Values.securityContext }}
@@ -72,11 +62,8 @@ spec:
             {{- end }}
           {{- end }}
           ports:
-            - name: http
+            - name: http1
               containerPort: 8553
-              protocol: TCP
-            - name: metrics
-              containerPort: 8701
               protocol: TCP
           livenessProbe:
             initialDelaySeconds: 20

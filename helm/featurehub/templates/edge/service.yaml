@@ -1,4 +1,4 @@
-{{- if .Values.edge.enabled }}
+{{- if and .Values.edge.enabled ( not .Values.global.knative.enabled ) }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -17,7 +17,7 @@ spec:
       targetPort: metrics
       protocol: TCP
       name: metrics
-  {{- end }}  
+  {{- end }}
   selector:
     {{- include "featurehub.edge.selectorLabels" . | nindent 4 }}
 {{- end }}

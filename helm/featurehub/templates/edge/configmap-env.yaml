@@ -9,7 +9,9 @@ data:
 {{- with .Values.edge.environmentVars }}
   {{- toYaml . | nindent 2 }}
 {{- end }}
+{{- if not .Values.global.knative }}
   monitor.port: "8701"
+{{- end }}
   server.port: "8553"
   {{- if ne .Values.global.urlPath "" }}
   featurehub.url-path: {{ .Values.global.urlPath | quote }}

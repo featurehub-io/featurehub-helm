@@ -1,26 +1,26 @@
-{{- if and .Values.edge.enabled ( not .Values.global.knative.enabled ) }}
+{{- if .Values.dacha.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "featurehub.edge.name" . }}
+  name: {{ include "featurehub.dacha.name" . }}
   labels:
-    {{- include "featurehub.edge.labels" . | nindent 4 }}
+    {{- include "featurehub.dacha.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.edge.replicaCount }}
-  {{- with .Values.edge.strategy }}
+  replicas: {{ .Values.dacha.replicaCount }}
+  {{- with .Values.dacha.strategy }}
   strategy:
     {{- . | toYaml | nindent 4 }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "featurehub.edge.selectorLabels" . | nindent 6 }}
+      {{- include "featurehub.dacha.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
-        checksum/edge-env: {{ include (print $.Template.BasePath "/edge/configmap-env.yaml") . | sha256sum }}
+        checksum/dacha-env: {{ include (print $.Template.BasePath "/dacha/configmap-env.yaml") . | sha256sum }}
 
-        {{- if and .Values.edge.envAsApplicationProperties .Values.edge.environmentVars }}
-        checksum/edge-app-config: {{ include (print $.Template.BasePath "/edge/configmap-app-config.yaml") . | sha256sum }}
+        {{- if and .Values.dacha.envAsApplicationProperties .Values.dacha.environmentVars }}
+        checksum/dacha-app-config: {{ include (print $.Template.BasePath "/dacha/configmap-app-config.yaml") . | sha256sum }}
         {{- end }}
 
         {{- if .Values.global.environmentVars }}
@@ -35,45 +35,43 @@ spec:
         checksum/global-common-config-extra: {{ include (print $.Template.BasePath "/common/configmap-global-common-config-extra.yaml") . | sha256sum }}
         {{- end }}
 
-        {{- range $key, $value := .Values.podAnnotations }}
+        {{- range $key, $value := .Values.dacha.podAnnotations }}
         {{ $key }}: {{ $value}}
         {{- end }}
       labels:
-        {{- include "featurehub.edge.selectorLabels" . | nindent 8 }}
+        {{- include "featurehub.dacha.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.dacha.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "featurehub.edge.serviceAccountName" . }}
+      serviceAccountName: {{ include "featurehub.dacha.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.dacha.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ include "featurehub.edge.name" . }}
-          {{- with .Values.securityContext }}
+        - name: {{ include "featurehub.dacha.name" . }}
           securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          image: "{{ .Values.edge.image.repository }}:{{ .Values.edge.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.pullPolicy }}
-          {{- if or (.Values.global.environmentVars) (.Values.edge.environmentVars) (.Values.edge.envFromSecret) }}
+            {{- toYaml .Values.dacha.securityContext | nindent 12 }}
+          image: "{{ .Values.dacha.image.repository }}:{{ .Values.dacha.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.dacha.pullPolicy }}
+          {{- if or (.Values.global.environmentVars) (.Values.dacha.environmentVars) (.Values.dacha.envFromSecret) }}
           envFrom:
             {{- if .Values.global.environmentVars }}
             - configMapRef:
                 name: {{ include "featurehub.fullname" . }}-global-common-env
             {{- end }}
-            {{- if .Values.edge.environmentVars }}
+            {{- if .Values.dacha.environmentVars }}
             - configMapRef:
-                name: {{ include "featurehub.fullname" . }}-edge-env
+                name: {{ include "featurehub.fullname" . }}-dacha-env
             {{- end }}
-            {{- if .Values.edge.envFromSecret }}
+            {{- if .Values.dacha.envFromSecret }}
             - secretRef:
-                name: {{ .Values.edge.envFromSecret }}
+                name: {{ .Values.dacha.envFromSecret }}
             {{- end }}
           {{- end }}
           ports:
             - name: http
-              containerPort: 8553
+              containerPort: 8600
               protocol: TCP
             - name: metrics
               containerPort: 8701
@@ -84,7 +82,7 @@ spec:
             failureThreshold: 2
             timeoutSeconds: 3
             httpGet:
-              path: {{ include "featurehub.liveness.url" . | quote }}
+              path: /health/liveness
               port: metrics
           readinessProbe:
             initialDelaySeconds: 20
@@ -93,12 +91,12 @@ spec:
             failureThreshold: 2
             timeoutSeconds: 3
             httpGet:
-              path: {{ include "featurehub.readiness.url" . | quote }}
+              path: /health/readiness
               port: metrics
           volumeMounts:
           {{- if gt ( len .Values.global.extraCommonConfigFiles ) 0 -}}
           {{- range $cm := .Values.global.extraCommonConfigFiles }}
-            - name: {{ $cm.configMapSuffix }}
+            - name: {{ $cm.configMapSuffix }} 
               mountPath: "/etc/common-config/{{ $cm.fileName }}"
               subPath: {{ $cm.fileName | quote }}
           {{- end }}
@@ -111,7 +109,7 @@ spec:
             - mountPath: /etc/common-config
               name: common-config-empty
           {{- end }}
-          {{- if and .Values.edge.envAsApplicationProperties .Values.edge.environmentVars }}
+          {{- if and .Values.dacha.envAsApplicationProperties .Values.dacha.environmentVars }}
             - mountPath: /etc/app-config/application.properties
               name: app-config
               subPath: application.properties
@@ -119,12 +117,12 @@ spec:
             - mountPath: /etc/app-config
               name: app-config-empty
           {{- end }}
-          {{- if .Values.edge.extraVolumeMounts }}
-            {{- toYaml .Values.edge.extraVolumeMounts | nindent 12 }}
+          {{- if .Values.dacha.extraVolumeMounts }}
+            {{- toYaml .Values.dacha.extraVolumeMounts | nindent 12 }}
           {{- end }}
           resources:
-            {{- toYaml .Values.edge.resources | nindent 12 }}
-      {{- with .Values.edge.extraContainers }}
+            {{- toYaml .Values.dacha.resources | nindent 12 }}
+      {{- with .Values.dacha.extraContainers }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
@@ -148,10 +146,10 @@ spec:
         - name: common-config-empty
           emptyDir: {}
       {{- end }}
-      {{- if and .Values.edge.envAsApplicationProperties .Values.edge.environmentVars }}
+      {{- if and .Values.dacha.envAsApplicationProperties .Values.dacha.environmentVars }}
         - name: app-config
           configMap:
-            name: {{ include "featurehub.fullname" . }}-edge-app-config
+            name: {{ include "featurehub.fullname" . }}-dacha-app-config
             items:
               - key: application.properties
                 path: application.properties
@@ -159,18 +157,18 @@ spec:
         - name: app-config-empty
           emptyDir: {}
       {{- end }}
-      {{- if .Values.edge.extraVolumes }}
-        {{- toYaml .Values.edge.extraVolumes | nindent 8 }}
+      {{- if .Values.dacha.extraVolumes }}
+        {{- toYaml .Values.dacha.extraVolumes | nindent 8 }}
       {{- end }}
-      {{- with .Values.edge.nodeSelector }}
+      {{- with .Values.dacha.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.edge.affinity }}
+      {{- with .Values.dacha.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.edge.tolerations }}
+      {{- with .Values.dacha.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

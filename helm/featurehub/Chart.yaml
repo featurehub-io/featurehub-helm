@@ -3,7 +3,7 @@ name: featurehub
 description: FeatureHub Release
 type: application
 version: 3.0.6
-icon: https://github.com/featurehub-io/featurehub/blob/main/docs/modules/ROOT/images/fh_icon.png
+icon: https://raw.githubusercontent.com/featurehub-io/featurehub/main/docs/modules/ROOT/images/fh_icon.png
 appVersion: "1.5.8"
 dependencies:
   - name: postgresql
