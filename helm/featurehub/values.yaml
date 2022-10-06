@@ -64,7 +64,7 @@ global:
            </Appenders>
 
            <Loggers>
-             <AsyncLogger name="io.featurehub" level="debug"/>
+             <AsyncLogger name="io.featurehub" level="trace"/>
              <!--
              <AsyncLogger name="io.ebean.SQL" level="trace"/>
              <AsyncLogger name="io.ebean.TXN" level="trace"/>
@@ -78,7 +78,7 @@ global:
              <AsyncLogger name="jersey-logging" level="trace"/>
              <AsyncLogger name="io.featurehub.db" level="trace"/>
              -->
-             <AsyncLogger name="io.featurehub.edge.features" level="debug"/>
+             <AsyncLogger name="io.featurehub.edge.features" level="trace"/>
 
            <AsyncLogger name="net.stickycode" level="warn"/>
            <AsyncLogger name="org.glassfish.jersey.server.wadl" level="error"/>
@@ -102,7 +102,7 @@ managementRepository:
 
   image:
     repository: featurehub/mr
-    tag: 1.5.8
+    tag: 1.5.9-RC
 
   pullPolicy: IfNotPresent
 
@@ -258,7 +258,7 @@ edge:
 
   image:
     repository: featurehub/edge
-    tag: 1.5.8
+    tag: 1.5.9-RC
 
   pullPolicy: IfNotPresent
 
@@ -386,7 +386,7 @@ dacha:
 
   image:
     repository: featurehub/dacha
-    tag: 1.5.8
+    tag: 1.5.9-RC
 
   pullPolicy: IfNotPresent
 

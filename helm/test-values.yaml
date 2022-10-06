@@ -3,9 +3,9 @@ pullPolicy: IfNotPresent
 securityPolicy: { }
 podSecurityPolicy: { }
 
-global:
+#global:
 #  urlPath: "/foo/featurehub"
-  intranet: true
+#  intranet: true
 
 #managementRepository:
 #  initContainers:
