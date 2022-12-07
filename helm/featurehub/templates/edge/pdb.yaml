@@ -1,0 +1,19 @@
+{{- if .Values.edge.podDisruptionBudget.enabled }}
+---
+apiVersion: {{ .Capabilities.APIVersions.Has "policy/v1" | ternary "policy/v1" "policy/v1beta1" }}
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "featurehub.edge.name" . }}
+  labels:
+    {{- include "featurehub.edge.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.edge.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.edge.podDisruptionBudget.minAvailable }}
+  {{- end }}
+  {{- if .Values.edge.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.edge.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "featurehub.edge.selectorLabels" . | nindent 6 }}
+{{- end }}

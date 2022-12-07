@@ -1,0 +1,19 @@
+{{- if .Values.managementRepository.podDisruptionBudget.enabled }}
+---
+apiVersion: {{ .Capabilities.APIVersions.Has "policy/v1" | ternary "policy/v1" "policy/v1beta1" }}
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "featurehub.managementRepository.name" . }}
+  labels:
+    {{- include "featurehub.managementRepository.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.managementRepository.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.managementRepository.podDisruptionBudget.minAvailable }}
+  {{- end }}
+  {{- if .Values.managementRepository.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.managementRepository.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "featurehub.managementRepository.selectorLabels" . | nindent 6 }}
+{{- end }}
