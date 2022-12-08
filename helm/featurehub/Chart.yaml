@@ -2,7 +2,7 @@ apiVersion: v2
 name: featurehub
 description: FeatureHub Release
 type: application
-version: 3.0.6
+version: 3.1.0
 icon: https://github.com/featurehub-io/featurehub/blob/main/docs/modules/ROOT/images/fh_icon.png
 appVersion: "1.5.8"
 dependencies:
