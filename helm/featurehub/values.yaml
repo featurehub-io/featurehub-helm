@@ -212,6 +212,13 @@ managementRepository:
 
   podAnnotations: {}
 
+  # Define a Pod Disruption Budget for the management-repository deployment
+  # ref: https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
+  podDisruptionBudget:
+    enabled: true
+    maxUnavailable: 1
+    # minAvailable: 1
+
   podSecurityContext:
     fsGroup: 999
 
@@ -348,6 +355,13 @@ edge:
 
   podAnnotations: {}
 
+  # Define a Pod Disruption Budget for the edge deployment
+  # ref: https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
+  podDisruptionBudget:
+    enabled: true
+    maxUnavailable: 1
+    # minAvailable: 1
+
   podSecurityContext:
     fsGroup: 999
 
@@ -471,6 +485,13 @@ dacha:
   imagePullSecrets: []
 
   podAnnotations: {}
+
+  # Define a Pod Disruption Budget for the dacha deployment
+  # ref: https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
+  podDisruptionBudget:
+    enabled: true
+    maxUnavailable: 1
+    # minAvailable: 1
 
   podSecurityContext:
     fsGroup: 999

@@ -1,6 +1,6 @@
 # featurehub
 
-![Version: 3.0.6](https://img.shields.io/badge/Version-3.0.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.5.8](https://img.shields.io/badge/AppVersion-1.5.8-informational?style=flat-square)
+![Version: 3.1.0](https://img.shields.io/badge/Version-3.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.5.8](https://img.shields.io/badge/AppVersion-1.5.8-informational?style=flat-square)
 
 FeatureHub Release
 
@@ -34,6 +34,8 @@ FeatureHub Release
 | dacha.ingress.tls | list | `[]` |  |
 | dacha.nodeSelector | object | `{}` |  |
 | dacha.podAnnotations | object | `{}` |  |
+| dacha.podDisruptionBudget.enabled | bool | `true` |  |
+| dacha.podDisruptionBudget.maxUnavailable | int | `1` |  |
 | dacha.podSecurityContext.fsGroup | int | `999` |  |
 | dacha.prometheus | object | `{"enabled":false,"labels":{}}` | Prometheus configuration |
 | dacha.prometheus.enabled | bool | `false` | Whether to enable or disable prometheus metrics endpoints, and serviceMonitor If enabled, metrics are exposed on port 8701, on /metrics endpoint |
@@ -67,6 +69,8 @@ FeatureHub Release
 | edge.ingress.tls | list | `[]` |  |
 | edge.nodeSelector | object | `{}` |  |
 | edge.podAnnotations | object | `{}` |  |
+| edge.podDisruptionBudget.enabled | bool | `true` |  |
+| edge.podDisruptionBudget.maxUnavailable | int | `1` |  |
 | edge.podSecurityContext.fsGroup | int | `999` |  |
 | edge.prometheus | object | `{"enabled":false,"labels":{}}` | Prometheus configuration |
 | edge.prometheus.enabled | bool | `false` | Whether to enable or disable prometheus metrics endpoints, and serviceMonitor If enabled, metrics are exposed on port 8701, on /metrics endpoint |
@@ -114,6 +118,8 @@ FeatureHub Release
 | managementRepository.initContainers | object | `{}` |  |
 | managementRepository.nodeSelector | object | `{}` |  |
 | managementRepository.podAnnotations | object | `{}` |  |
+| managementRepository.podDisruptionBudget.enabled | bool | `true` |  |
+| managementRepository.podDisruptionBudget.maxUnavailable | int | `1` |  |
 | managementRepository.podSecurityContext.fsGroup | int | `999` |  |
 | managementRepository.prometheus | object | `{"enabled":false,"labels":{}}` | Prometheus configuration |
 | managementRepository.prometheus.enabled | bool | `false` | Whether to enable or disable prometheus metrics endpoints, and serviceMonitor If enabled, metrics are exposed on port 8701, on /metrics endpoint |
