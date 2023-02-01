@@ -1,6 +1,6 @@
 # featurehub
 
-![Version: 3.2.0](https://img.shields.io/badge/Version-3.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.0](https://img.shields.io/badge/AppVersion-1.6.0-informational?style=flat-square)
+![Version: 4.0.0](https://img.shields.io/badge/Version-4.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.0](https://img.shields.io/badge/AppVersion-1.6.0-informational?style=flat-square)
 
 FeatureHub Release
 
@@ -8,8 +8,8 @@ FeatureHub Release
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://nats-io.github.io/k8s/helm/charts/ | nats | 0.13.1 |
-| https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami | postgresql | 11.0.5 |
+| https://nats-io.github.io/k8s/helm/charts/ | nats | 0.19.6 |
+| https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami | postgresql | 12.1.13 |
 
 ## Values
 
@@ -19,12 +19,12 @@ FeatureHub Release
 | dacha.enabled | bool | `true` |  |
 | dacha.envAsAppConfigFile | bool | `true` | If `true`, entries from `environmentVars` and `envFromSecret` fields will be mapped to configuration files. `environmentVars` to /etc/app-config/application.properties `envFromSecret` to /etc/app-config/secrets.properties Used for retrocompatiblity with FeatureHub controller versions lower than 1.5.0 https://docs.featurehub.io/featurehub/latest/installation.html#_run_configuration |
 | dacha.envFromSecret | string | `""` | Name of the secret containing secret properties, to be exposed as environment variables to dacha deployment. Create the secret in advance, then reference it here. As of 1.5.0 all FeatureHub controller properties are available as environment variables using the same case Entries of the secret specified here are the same as would be specified in /etc/app-config/secrets.properties |
-| dacha.environmentVars | object | `{"cache.pool-size":"10"}` | Environment variables to be exposed to dacha deployment. As of 1.5.0 all FeatureHub controller properties are available as environment variables using the same case. Entries accepted here are the same as would be specified in /etc/app-config/applications.properties. Note that `server.port` and `monitor.port` use their default values of `8085` and `8701` respectively, to make it easier to implement the deployment, service and the prometheus serviceMonitor manifests. |
+| dacha.environmentVars | object | `{"cache.pool-size":"10","dacha1.enabled":"false","dacha2.enabled":"true","management-repository.url":"http://featurehub-management-repository:8701"}` | Environment variables to be exposed to dacha deployment. As of 1.5.0 all FeatureHub controller properties are available as environment variables using the same case. Entries accepted here are the same as would be specified in /etc/app-config/applications.properties. Note that `server.port` and `monitor.port` use their default values of `8085` and `8701` respectively, to make it easier to implement the deployment, service and the prometheus serviceMonitor manifests. |
 | dacha.extraContainers | list | `[]` | List of extra containers to add to Dacha Pod |
 | dacha.extraEnvironmentVars | object | `{}` | Extra environment variables to be exposed to dacha deployment. In terms of environment variable setting, this is the same as `environmentVars` field. The only difference is that if `envAsAppConfigFile: true`, only entries from `environmentVars` will be mapped to the application.properties configuration file, and not the ones from `extraEnvironmentVars`. |
 | dacha.extraVolumeMounts | list | `[]` | List of extra mounts to add to Dacha Deployment |
 | dacha.extraVolumes | list | `[]` | List of extra volumes to add to Dacha Deployment |
-| dacha.image.repository | string | `"featurehub/dacha"` |  |
+| dacha.image.repository | string | `"featurehub/dacha2"` |  |
 | dacha.image.tag | string | `"1.6.0"` |  |
 | dacha.imagePullSecrets | list | `[]` |  |
 | dacha.ingress.annotations | object | `{}` |  |
@@ -54,7 +54,7 @@ FeatureHub Release
 | edge.enabled | bool | `true` |  |
 | edge.envAsAppConfigFile | bool | `true` | If `true`, entries from `environmentVars` and `envFromSecret` fields will be mapped to configuration files. `environmentVars` to /etc/app-config/application.properties `envFromSecret` to /etc/app-config/secrets.properties Used for retrocompatiblity with FeatureHub controller versions lower than 1.5.0 https://docs.featurehub.io/featurehub/latest/installation.html#_run_configuration |
 | edge.envFromSecret | string | `""` | Name of the secret containing secret properties, to be exposed as environment variables to edge deployment. Create the secret in advance, then reference it here. As of 1.5.0 all FeatureHub controller properties are available as environment variables using the same case Entries of the secret specified here are the same as would be specified in /etc/app-config/secrets.properties |
-| edge.environmentVars | object | `{"dacha.url.default":"http://featurehub-dacha:8600","listen.pool-size":"30","maxSlots":"30","server.gracePeriodInSeconds":"10","update.pool-size":"30"}` | Environment variables to be exposed to edge deployment. As of 1.5.0 all FeatureHub controller properties are available as environment variables using the same case. Entries accepted here are the same as would be specified in /etc/app-config/applications.properties. Note that `server.port` and `monitor.port` use their default values of `8085` and `8701` respectively, to make it easier to implement the deployment, service and the prometheus serviceMonitor manifests. |
+| edge.environmentVars | object | `{"dacha.url.default":"http://featurehub-dacha:8600","dacha1.enabled":"false","dacha2.enabled":"true","listen.pool-size":"30","maxSlots":"30","server.gracePeriodInSeconds":"10","update.pool-size":"30"}` | Environment variables to be exposed to edge deployment. As of 1.5.0 all FeatureHub controller properties are available as environment variables using the same case. Entries accepted here are the same as would be specified in /etc/app-config/applications.properties. Note that `server.port` and `monitor.port` use their default values of `8085` and `8701` respectively, to make it easier to implement the deployment, service and the prometheus serviceMonitor manifests. |
 | edge.extraContainers | list | `[]` | List of extra containers to add to Edge Pod |
 | edge.extraEnvironmentVars | object | `{}` | Extra environment variables to be exposed to edge deployment. In terms of environment variable setting, this is the same as `environmentVars` field. The only difference is that if `envAsAppConfigFile: true`, only entries from `environmentVars` will be mapped to the application.properties configuration file, and not the ones from `extraEnvironmentVars`. |
 | edge.extraVolumeMounts | list | `[]` | List of extra mounts to add to Edge Deployment |
@@ -102,7 +102,7 @@ FeatureHub Release
 | managementRepository.enabled | bool | `true` |  |
 | managementRepository.envAsApplicationProperties | bool | `false` | If `true`, entries from `environmentVars` will be mapped to /etc/app-config/application.properties file To mount secret settings as /etc/app-config/application.properties see volume fields Used for retrocompatiblity with FeatureHub controller versions lower than 1.5.0 https://docs.featurehub.io/featurehub/latest/installation.html#_run_configuration |
 | managementRepository.envFromSecret | string | `""` | Name of the secret containing secret properties, to be exposed as environment variables to edge deployment. Create the secret in advance, then reference it here. As of 1.5.0 all FeatureHub controller properties are available as environment variables using the same case Entries of the secret specified here are the same as would be specified in /etc/app-config/secrets.properties |
-| managementRepository.environmentVars | object | `{"db.connections":"20","db.password":"featurehub","db.url":"jdbc:postgresql://featurehub-postgresql:5432/featurehub","db.username":"featurehub","portfolio.admin.group.suffix":"Administrators"}` | Environment variables to be exposed to management-repository deployment. As of 1.5.0 all FeatureHub controller properties are available as environment variables using the same case. Entries accepted here are the same as would be specified in /etc/app-config/applications.properties. Note that `server.port` and `monitor.port` use their default values of `8085` and `8701` respectively, to make it easier to implement the deployment, service and the prometheus serviceMonitor manifests. |
+| managementRepository.environmentVars | object | `{"dacha1.enabled":"false","dacha2.enabled":"true","db.connections":"20","db.password":"featurehub","db.url":"jdbc:postgresql://featurehub-postgresql:5432/featurehub","db.username":"featurehub","portfolio.admin.group.suffix":"Administrators"}` | Environment variables to be exposed to management-repository deployment. As of 1.5.0 all FeatureHub controller properties are available as environment variables using the same case. Entries accepted here are the same as would be specified in /etc/app-config/applications.properties. Note that `server.port` and `monitor.port` use their default values of `8085` and `8701` respectively, to make it easier to implement the deployment, service and the prometheus serviceMonitor manifests. |
 | managementRepository.extraContainers | list | `[]` | List of extra containers to add to Management Repository Pod |
 | managementRepository.extraEnvironmentVars | object | `{}` | Extra environment variables to be exposed to management-repository deployment. In terms of environment variable setting, this is the same as `environmentVars` field. The only difference is that if `envAsAppConfigFile: true`, only entries from `environmentVars` will be mapped to the application.properties configuration file, and not the ones from `extraEnvironmentVars`. |
 | managementRepository.extraVolumeMounts | list | `[]` | List of extra mounts to add to Management Repository Deployment |
@@ -136,7 +136,7 @@ FeatureHub Release
 | managementRepository.tolerations | list | `[]` |  |
 | nameOverride | string | `""` |  |
 | nats | object | `{"cluster":{"enabled":true,"name":"featurehub","replicas":3},"enabled":true,"topologyKeys":[]}` | ----------------------------------------------------------------------------- # |
-| postgresql | object | `{"enabled":true,"global":{"postgresql":{"auth":{"postgresPassword":"postgresql"}}},"primary":{"initdb":{"scripts":{"featurehub.sql":"CREATE USER featurehub PASSWORD 'featurehub'; CREATE DATABASE featurehub; GRANT ALL PRIVILEGES ON DATABASE featurehub TO featurehub;"}},"persistence":{"accessModes":["ReadWriteOnce"],"enabled":true,"size":"128Mi","storageClassName":"standard"}}}` | ----------------------------------------------------------------------------- # |
+| postgresql | object | `{"enabled":true,"global":{"postgresql":{"auth":{"postgresPassword":"postgresql"}}},"primary":{"initdb":{"scripts":{"featurehub.sql":"CREATE USER featurehub PASSWORD 'featurehub' LOGIN;\nCREATE DATABASE featurehub;\nGRANT ALL PRIVILEGES ON DATABASE featurehub TO featurehub;\n\\connect featurehub\nGRANT ALL ON SCHEMA public TO featurehub;"}},"persistence":{"accessModes":["ReadWriteOnce"],"enabled":true,"size":"128Mi","storageClassName":"standard"}}}` | ----------------------------------------------------------------------------- # |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)

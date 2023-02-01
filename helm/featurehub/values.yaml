@@ -147,6 +147,8 @@ managementRepository:
     db.password: featurehub
     db.connections: "20"
     portfolio.admin.group.suffix: Administrators
+    dacha1.enabled: "false"
+    dacha2.enabled: "true"
 
   # -- If `true`, entries from `environmentVars` will be mapped to /etc/app-config/application.properties file
   # To mount secret settings as /etc/app-config/application.properties see volume fields
@@ -307,6 +309,9 @@ edge:
     listen.pool-size: "30"
     server.gracePeriodInSeconds: "10"
     dacha.url.default: http://featurehub-dacha:8600
+    dacha1.enabled: "false"
+    dacha2.enabled: "true"
+
 
   # -- If `true`, entries from `environmentVars` and `envFromSecret` fields will be mapped to configuration files.
   # `environmentVars` to /etc/app-config/application.properties
@@ -399,7 +404,7 @@ dacha:
     #type: RollingUpdate
 
   image:
-    repository: featurehub/dacha
+    repository: featurehub/dacha2
     tag: 1.6.0
 
   pullPolicy: IfNotPresent
@@ -438,6 +443,10 @@ dacha:
   # it easier to implement the deployment, service and the prometheus serviceMonitor manifests.
   environmentVars:
     cache.pool-size: "10"
+    dacha1.enabled: "false"
+    dacha2.enabled: "true"
+    # Dacha2 calls MR via the Management API to avoid public internet traffic (by default)
+    management-repository.url: "http://featurehub-management-repository:8701"
 
   # -- If `true`, entries from `environmentVars` and `envFromSecret` fields will be mapped to configuration files.
   # `environmentVars` to /etc/app-config/application.properties
@@ -559,8 +568,10 @@ postgresql:
       scripts:
         # strongly recommended ensuring that the values in this init script
         # match the ones set in .Values.db
-        featurehub.sql:
-          CREATE USER featurehub PASSWORD 'featurehub';
+        featurehub.sql: |-
+          CREATE USER featurehub PASSWORD 'featurehub' LOGIN;
           CREATE DATABASE featurehub;
           GRANT ALL PRIVILEGES ON DATABASE featurehub TO featurehub;
+          \connect featurehub
+          GRANT ALL ON SCHEMA public TO featurehub;
 
