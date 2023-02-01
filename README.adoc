@@ -127,6 +127,10 @@ featurehub is here%
 If there is something wrong with the health check of a service, then the logs should be printing
 out exactly what is wrong, and so should the endpoint.
 
+== Contributing
+
+Please ensure that you install and run https://github.com/norwoodj/helm-docs[helm-docs] before issuing a PR because the workflow confirms it is up to date. It is required for publishing to
+the Helm Artifact Registry.
 
 == License
 
