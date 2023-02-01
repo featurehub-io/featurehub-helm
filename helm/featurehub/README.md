@@ -8,8 +8,8 @@ FeatureHub Release
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://charts.bitnami.com/bitnami | postgresql | 11.0.5 |
 | https://nats-io.github.io/k8s/helm/charts/ | nats | 0.13.1 |
+| https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami | postgresql | 11.0.5 |
 
 ## Values
 
