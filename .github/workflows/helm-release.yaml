@@ -31,6 +31,8 @@ jobs:
         run: |
           # Install yq tool to parse Chart.yaml to identify Helm dependencies repositories
           wget https://github.com/mikefarah/yq/releases/download/v4.21.1/yq_linux_386 -O /usr/bin/yq && chmod +x /usr/bin/yq
+          
+          apt-get update && apt-get install yq
 
           # Retrieve all helm dependencies repositories and run `helm repo add` for each of them.
           # Command explanation follows:
@@ -45,7 +47,7 @@ jobs:
           done
 
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.5.0
+        uses: helm/chart-releaser-action@v1.4.1
         with:
           charts_dir: helm
         env:
