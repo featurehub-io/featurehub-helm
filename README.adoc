@@ -2,6 +2,8 @@
 
 We publish helm charts to https://artifacthub.io/packages/search?repo=featurehub[image:https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/featurehub[Artifact HUB]].
 
+NOTE: If you are coming from an earlier version, please read the <<changelog>>.
+
 == Deploying FeatureHub on Kubernetes
 
 These instructions are designed to get you up and running on a local kubernetes running on KinD. They will be
@@ -126,6 +128,25 @@ featurehub is here%
 
 If there is something wrong with the health check of a service, then the logs should be printing
 out exactly what is wrong, and so should the endpoint.
+
+== Changelog [[changelog]]
+
+=== 4.0.0 - enabling Dacha2
+
+FeatureHub v1.6.0 with https://docs.featurehub.io/featurehub/latest/migration.html#_overview[Dacha2], the new caching layer. Dacha2 will start up faster, but will initially have no data in it, so it will be slower (on the first request) to respond  The addition is that
+it needs to know where MR is, because when it comes across an environment or service key it doesn't
+understand, it will ask MR (failures get cached so MR doesn't get spammed with invalid requests). Dacha1 is being supported over the new few major versions but is slowly being phased out.
+
+The changes to the chart include turning off Dacha1 support and turning on Dacha2 and telling
+Dacha2 where the MR is.
+
+We have also upgraded the embedded NATS chart to version 2.9.1 of NATS, and the Postgres chart to version 15 of Postgres. The new
+schema permissions model has required a minor tweak of the startup
+script here.
+
+=== 3.2.0 - FeatureHub v1.6.0 release
+
+Includes FeatureHub v1.6.0 release. No other changes were made to the chart.
 
 == Contributing
 

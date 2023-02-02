@@ -2,16 +2,16 @@ apiVersion: v2
 name: featurehub
 description: FeatureHub Release
 type: application
-version: 3.2.0
-icon: https://github.com/featurehub-io/featurehub/blob/main/docs/modules/ROOT/images/fh_icon.png
+version: 4.0.0
+icon: https://raw.githubusercontent.com/featurehub-io/featurehub/main/docs/modules/ROOT/images/fh_icon.png
 appVersion: "1.6.0"
 dependencies:
   - name: postgresql
-    version: 11.0.5
+    version: 12.1.13
     repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
     condition: postgresql.enabled
   - name: nats
-    version: 0.13.1
+    version: 0.19.6
     repository: https://nats-io.github.io/k8s/helm/charts/
     condition: nats.enabled
 
