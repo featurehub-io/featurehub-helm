@@ -1,6 +1,6 @@
 # featurehub
 
-![Version: 4.0.0](https://img.shields.io/badge/Version-4.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.0](https://img.shields.io/badge/AppVersion-1.6.0-informational?style=flat-square)
+![Version: 4.0.2](https://img.shields.io/badge/Version-4.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.1](https://img.shields.io/badge/AppVersion-1.6.1-informational?style=flat-square)
 
 FeatureHub Release
 
@@ -25,7 +25,7 @@ FeatureHub Release
 | dacha.extraVolumeMounts | list | `[]` | List of extra mounts to add to Dacha Deployment |
 | dacha.extraVolumes | list | `[]` | List of extra volumes to add to Dacha Deployment |
 | dacha.image.repository | string | `"featurehub/dacha2"` |  |
-| dacha.image.tag | string | `"1.6.0"` |  |
+| dacha.image.tag | string | `"1.6.1-RC"` |  |
 | dacha.imagePullSecrets | list | `[]` |  |
 | dacha.ingress.annotations | object | `{}` |  |
 | dacha.ingress.className | string | `""` |  |
@@ -54,13 +54,13 @@ FeatureHub Release
 | edge.enabled | bool | `true` |  |
 | edge.envAsAppConfigFile | bool | `true` | If `true`, entries from `environmentVars` and `envFromSecret` fields will be mapped to configuration files. `environmentVars` to /etc/app-config/application.properties `envFromSecret` to /etc/app-config/secrets.properties Used for retrocompatiblity with FeatureHub controller versions lower than 1.5.0 https://docs.featurehub.io/featurehub/latest/installation.html#_run_configuration |
 | edge.envFromSecret | string | `""` | Name of the secret containing secret properties, to be exposed as environment variables to edge deployment. Create the secret in advance, then reference it here. As of 1.5.0 all FeatureHub controller properties are available as environment variables using the same case Entries of the secret specified here are the same as would be specified in /etc/app-config/secrets.properties |
-| edge.environmentVars | object | `{"dacha.url.default":"http://featurehub-dacha:8600","dacha1.enabled":"false","dacha2.enabled":"true","listen.pool-size":"30","maxSlots":"30","server.gracePeriodInSeconds":"10","update.pool-size":"30"}` | Environment variables to be exposed to edge deployment. As of 1.5.0 all FeatureHub controller properties are available as environment variables using the same case. Entries accepted here are the same as would be specified in /etc/app-config/applications.properties. Note that `server.port` and `monitor.port` use their default values of `8085` and `8701` respectively, to make it easier to implement the deployment, service and the prometheus serviceMonitor manifests. |
+| edge.environmentVars | object | `{"dacha.timeout.read":"12000","dacha.url.default":"http://featurehub-dacha:8600","dacha1.enabled":"false","dacha2.enabled":"true","listen.pool-size":"30","maxSlots":"30","server.gracePeriodInSeconds":"10","update.pool-size":"30"}` | Environment variables to be exposed to edge deployment. As of 1.5.0 all FeatureHub controller properties are available as environment variables using the same case. Entries accepted here are the same as would be specified in /etc/app-config/applications.properties. Note that `server.port` and `monitor.port` use their default values of `8085` and `8701` respectively, to make it easier to implement the deployment, service and the prometheus serviceMonitor manifests. |
 | edge.extraContainers | list | `[]` | List of extra containers to add to Edge Pod |
 | edge.extraEnvironmentVars | object | `{}` | Extra environment variables to be exposed to edge deployment. In terms of environment variable setting, this is the same as `environmentVars` field. The only difference is that if `envAsAppConfigFile: true`, only entries from `environmentVars` will be mapped to the application.properties configuration file, and not the ones from `extraEnvironmentVars`. |
 | edge.extraVolumeMounts | list | `[]` | List of extra mounts to add to Edge Deployment |
 | edge.extraVolumes | list | `[]` | List of extra volumes to add to Edge Deployment |
 | edge.image.repository | string | `"featurehub/edge"` |  |
-| edge.image.tag | string | `"1.6.0"` |  |
+| edge.image.tag | string | `"1.6.1-RC"` |  |
 | edge.imagePullSecrets | list | `[]` |  |
 | edge.ingress.annotations | object | `{}` |  |
 | edge.ingress.className | string | `""` |  |
@@ -108,7 +108,7 @@ FeatureHub Release
 | managementRepository.extraVolumeMounts | list | `[]` | List of extra mounts to add to Management Repository Deployment |
 | managementRepository.extraVolumes | list | `[]` | List of extra volumes to add to Management Repository Deployment |
 | managementRepository.image.repository | string | `"featurehub/mr"` |  |
-| managementRepository.image.tag | string | `"1.6.0"` |  |
+| managementRepository.image.tag | string | `"1.6.1-RC"` |  |
 | managementRepository.imagePullSecrets | list | `[]` |  |
 | managementRepository.ingress.annotations | object | `{}` |  |
 | managementRepository.ingress.className | string | `""` |  |

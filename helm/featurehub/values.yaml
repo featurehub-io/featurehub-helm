@@ -102,7 +102,7 @@ managementRepository:
 
   image:
     repository: featurehub/mr
-    tag: 1.6.0
+    tag: 1.6.1-RC
 
   pullPolicy: IfNotPresent
 
@@ -267,7 +267,7 @@ edge:
 
   image:
     repository: featurehub/edge
-    tag: 1.6.0
+    tag: 1.6.1-RC
 
   pullPolicy: IfNotPresent
 
@@ -311,6 +311,7 @@ edge:
     dacha.url.default: http://featurehub-dacha:8600
     dacha1.enabled: "false"
     dacha2.enabled: "true"
+    dacha.timeout.read: "12000"  # this should reflect the sizing/capability of your database to respond to the 1st time a key is requested
 
 
   # -- If `true`, entries from `environmentVars` and `envFromSecret` fields will be mapped to configuration files.
@@ -405,7 +406,7 @@ dacha:
 
   image:
     repository: featurehub/dacha2
-    tag: 1.6.0
+    tag: 1.6.1-RC
 
   pullPolicy: IfNotPresent
 
