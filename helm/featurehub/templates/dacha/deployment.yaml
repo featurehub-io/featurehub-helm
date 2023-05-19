@@ -79,7 +79,7 @@ spec:
           livenessProbe:
             initialDelaySeconds: 20
             periodSeconds: 20
-            failureThreshold: 2
+            failureThreshold: 1  # we set this to 1 because if the health check fails, it means the cache is compromised
             timeoutSeconds: 3
             httpGet:
               path: /health/liveness
@@ -88,7 +88,7 @@ spec:
             initialDelaySeconds: 20
             periodSeconds: 20
             successThreshold: 2
-            failureThreshold: 2
+            failureThreshold: 1
             timeoutSeconds: 3
             httpGet:
               path: /health/readiness
@@ -96,7 +96,7 @@ spec:
           volumeMounts:
           {{- if gt ( len .Values.global.extraCommonConfigFiles ) 0 -}}
           {{- range $cm := .Values.global.extraCommonConfigFiles }}
-            - name: {{ $cm.configMapSuffix }} 
+            - name: {{ $cm.configMapSuffix }}
               mountPath: "/etc/common-config/{{ $cm.fileName }}"
               subPath: {{ $cm.fileName | quote }}
           {{- end }}
