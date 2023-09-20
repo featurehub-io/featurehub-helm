@@ -1,6 +1,6 @@
 # featurehub
 
-![Version: 4.0.4](https://img.shields.io/badge/Version-4.0.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.1](https://img.shields.io/badge/AppVersion-1.6.1-informational?style=flat-square)
+![Version: 4.0.5](https://img.shields.io/badge/Version-4.0.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.3](https://img.shields.io/badge/AppVersion-1.6.3-informational?style=flat-square)
 
 FeatureHub Release
 
@@ -25,7 +25,7 @@ FeatureHub Release
 | dacha.extraVolumeMounts | list | `[]` | List of extra mounts to add to Dacha Deployment |
 | dacha.extraVolumes | list | `[]` | List of extra volumes to add to Dacha Deployment |
 | dacha.image.repository | string | `"featurehub/dacha2"` |  |
-| dacha.image.tag | string | `"1.6.2"` |  |
+| dacha.image.tag | string | `"1.6.3"` |  |
 | dacha.imagePullSecrets | list | `[]` |  |
 | dacha.ingress.annotations | object | `{}` |  |
 | dacha.ingress.className | string | `""` |  |
@@ -60,7 +60,7 @@ FeatureHub Release
 | edge.extraVolumeMounts | list | `[]` | List of extra mounts to add to Edge Deployment |
 | edge.extraVolumes | list | `[]` | List of extra volumes to add to Edge Deployment |
 | edge.image.repository | string | `"featurehub/edge"` |  |
-| edge.image.tag | string | `"1.6.2"` |  |
+| edge.image.tag | string | `"1.6.3"` |  |
 | edge.imagePullSecrets | list | `[]` |  |
 | edge.ingress.annotations | object | `{}` |  |
 | edge.ingress.className | string | `""` |  |
@@ -108,7 +108,7 @@ FeatureHub Release
 | managementRepository.extraVolumeMounts | list | `[]` | List of extra mounts to add to Management Repository Deployment |
 | managementRepository.extraVolumes | list | `[]` | List of extra volumes to add to Management Repository Deployment |
 | managementRepository.image.repository | string | `"featurehub/mr"` |  |
-| managementRepository.image.tag | string | `"1.6.2"` |  |
+| managementRepository.image.tag | string | `"1.6.3"` |  |
 | managementRepository.imagePullSecrets | list | `[]` |  |
 | managementRepository.ingress.annotations | object | `{}` |  |
 | managementRepository.ingress.className | string | `""` |  |
