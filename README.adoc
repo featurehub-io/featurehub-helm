@@ -131,6 +131,22 @@ out exactly what is wrong, and so should the endpoint.
 
 == Changelog [[changelog]]
 
+=== 4.0.4
+
+The backend services port for MR was not open so Dacha2 was failing to connect on a restart of service.
+
+=== 4.0.3
+
+Release 1.6.2 of FeatureHub.
+
+=== 4.0.2
+
+Shifting path in global ingress to deal with k8s installs that can't handle default routes.
+
+=== 4.0.1
+
+Release 1.6.1 of FeatureHub
+
 === 4.0.0 - enabling Dacha2
 
 FeatureHub v1.6.0 with https://docs.featurehub.io/featurehub/latest/migration.html#_overview[Dacha2], the new caching layer. Dacha2 will start up faster, but will initially have no data in it, so it will be slower (on the first request) to respond  The addition is that
