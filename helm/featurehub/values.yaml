@@ -102,7 +102,7 @@ managementRepository:
 
   image:
     repository: featurehub/mr
-    tag: 1.6.3
+    tag: 1.7.0
 
   pullPolicy: IfNotPresent
 
@@ -267,7 +267,7 @@ edge:
 
   image:
     repository: featurehub/edge
-    tag: 1.6.3
+    tag: 1.7.0
 
   pullPolicy: IfNotPresent
 
@@ -406,7 +406,7 @@ dacha:
 
   image:
     repository: featurehub/dacha2
-    tag: 1.6.3
+    tag: 1.7.0
 
   pullPolicy: IfNotPresent
 

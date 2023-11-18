@@ -131,6 +131,14 @@ out exactly what is wrong, and so should the endpoint.
 
 == Changelog [[changelog]]
 
+=== 4.0.6
+
+Release for version 1.7.0
+
+=== 4.0.5
+
+Release for version 1.6.3
+
 === 4.0.4
 
 The backend services port for MR was not open so Dacha2 was failing to connect on a restart of service.
