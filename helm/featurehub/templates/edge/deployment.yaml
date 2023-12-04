@@ -60,6 +60,10 @@ spec:
             - configMapRef:
                 name: {{ include "featurehub.fullname" . }}-global-common-env
             {{- end }}
+            {{- if Values.global.envFromSecret}}
+            - secretRef:
+                name: {{ Values.global.envFromSecret }}
+            {{- end }}
             {{- if .Values.edge.environmentVars }}
             - configMapRef:
                 name: {{ include "featurehub.fullname" . }}-edge-env

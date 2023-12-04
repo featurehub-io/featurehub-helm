@@ -68,6 +68,10 @@ spec:
             - configMapRef:
                 name: {{ include "featurehub.fullname" . }}-global-common-env
             {{- end }}
+            {{- if Values.global.envFromSecret}}
+            - secretRef:
+                name: {{ Values.global.envFromSecret }}
+            {{- end }}
             {{- if .Values.managementRepository.environmentVars }}
             - configMapRef:
                 name: {{ include "featurehub.fullname" . }}-management-repository-env
