@@ -54,7 +54,7 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.edge.image.repository }}:{{ .Values.edge.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.pullPolicy }}
-          {{- if or (.Values.global.environmentVars) (.Values.edge.environmentVars) (.Values.edge.envFromSecret) }}
+          {{- if or (.Values.global.environmentVars) (.Values.global.envFromSecret) (.Values.edge.environmentVars) (.Values.edge.envFromSecret) }}
           envFrom:
             {{- if .Values.global.environmentVars }}
             - configMapRef:
