@@ -20,6 +20,12 @@ global:
   environmentVars:
     nats.urls: "nats://featurehub-nats"
 
+  # -- Name of the secret containing secret properties, to be exposed as environment variables to
+  # Management Repository, Edge and Dacha deployments. Create the secret in advance, then reference it here.
+  # As of 1.5.0 all FeatureHub controller properties are available as environment variables using the same case
+  # Entries of the secret specified here are the same as would be specified in /etc/app-config/secrets.properties
+  envFromSecret: ""
+
   # This is only used for the short-cut KinD ingress, you would not use this in your own cluster
   ingress:
     enabled: true

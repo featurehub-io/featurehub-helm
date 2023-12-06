@@ -54,11 +54,15 @@ spec:
             {{- toYaml .Values.dacha.securityContext | nindent 12 }}
           image: "{{ .Values.dacha.image.repository }}:{{ .Values.dacha.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.dacha.pullPolicy }}
-          {{- if or (.Values.global.environmentVars) (.Values.dacha.environmentVars) (.Values.dacha.envFromSecret) }}
+          {{- if or (.Values.global.environmentVars) (.Values.global.envFromSecret) (.Values.dacha.environmentVars) (.Values.dacha.envFromSecret) }}
           envFrom:
             {{- if .Values.global.environmentVars }}
             - configMapRef:
                 name: {{ include "featurehub.fullname" . }}-global-common-env
+            {{- end }}
+            {{- if Values.global.envFromSecret}}
+            - secretRef:
+                name: {{ Values.global.envFromSecret }}
             {{- end }}
             {{- if .Values.dacha.environmentVars }}
             - configMapRef:

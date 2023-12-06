@@ -62,11 +62,15 @@ spec:
           {{- end }}
           image: "{{ .Values.managementRepository.image.repository }}:{{ .Values.managementRepository.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.pullPolicy }}
-          {{- if or (.Values.global.environmentVars) (.Values.managementRepository.environmentVars) (.Values.managementRepository.envFromSecret) }}
+          {{- if or (.Values.global.environmentVars) (.Values.global.envFromSecret) (.Values.managementRepository.environmentVars) (.Values.managementRepository.envFromSecret) }}
           envFrom:
             {{- if .Values.global.environmentVars }}
             - configMapRef:
                 name: {{ include "featurehub.fullname" . }}-global-common-env
+            {{- end }}
+            {{- if Values.global.envFromSecret}}
+            - secretRef:
+                name: {{ Values.global.envFromSecret }}
             {{- end }}
             {{- if .Values.managementRepository.environmentVars }}
             - configMapRef:
