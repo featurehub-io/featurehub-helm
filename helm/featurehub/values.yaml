@@ -45,13 +45,13 @@ global:
 
   # -- List of extra mounts to add to Management Repository Deployment
   extraVolumeMounts: []
-    #- mountPath: /etc/app-config/secrets.properties
-    #  name: secrets-properties
-    #  subPath: secrets.properties
+    # - mountPath: /etc/app-config/secrets.properties
+    #   name: secrets-properties
+    #   subPath: secrets.properties
 
   # -- List of extra volumes to add to Management Repository Deployment
   extraVolumes: []
-    #- name: secrets-properties
+    # - name: secrets-properties
     #  secret:
     #    secretName: featurehub-management-repository-secrets-properties
     #    items:
@@ -104,7 +104,7 @@ managementRepository:
   replicaCount: 1
 
   strategy: {}
-    #type: RollingUpdate
+    # type: RollingUpdate
 
   image:
     repository: featurehub/mr
@@ -189,7 +189,7 @@ managementRepository:
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
     hosts: []
-      #- localhost
+# - localhost
 #        paths:
 #          - path: /mr-api
 #            pathType: Prefix
@@ -240,7 +240,7 @@ managementRepository:
 
   # -- List of extra containers to add to Management Repository Pod
   extraContainers: []
-    #- name: do-something
+    # - name: do-something
     #  image: busybox
     #  command: ['do', 'something']
 
@@ -250,13 +250,13 @@ managementRepository:
   #
   # -- List of extra mounts to add to Management Repository Deployment
   extraVolumeMounts: []
-    #- mountPath: /etc/app-config/secrets.properties
+    # - mountPath: /etc/app-config/secrets.properties
     #  name: secrets-properties
     #  subPath: secrets.properties
 
   # -- List of extra volumes to add to Management Repository Deployment
   extraVolumes: []
-    #- name: secrets-properties
+    # - name: secrets-properties
     #  secret:
     #    secretName: featurehub-management-repository-secrets-properties
     #    items:
@@ -269,7 +269,7 @@ edge:
   replicaCount: 2
 
   strategy: {}
-    #type: RollingUpdate
+    # type: RollingUpdate
 
   image:
     repository: featurehub/edge
@@ -387,18 +387,18 @@ edge:
 
   # -- List of extra containers to add to Edge Pod
   extraContainers: []
-    #- name: do-something
+    # - name: do-something
     #  image: busybox
     #  command: ['do', 'something']
 
   # -- List of extra mounts to add to Edge Deployment
   extraVolumeMounts: []
-    #- mountPath: /tmp/foobar
+    # - mountPath: /tmp/foobar
     #  name: foobar
 
   # -- List of extra volumes to add to Edge Deployment
   extraVolumes: []
-    #- name: foobar
+    # - name: foobar
     #  emptyDir: {}
 
 
@@ -408,7 +408,7 @@ dacha:
   replicaCount: 2
 
   strategy: {}
-    #type: RollingUpdate
+    # type: RollingUpdate
 
   image:
     repository: featurehub/dacha2
@@ -522,18 +522,18 @@ dacha:
 
   # -- List of extra containers to add to Dacha Pod
   extraContainers: []
-    #- name: do-something
+    # - name: do-something
     #  image: busybox
     #  command: ['do', 'something']
 
   # -- List of extra mounts to add to Dacha Deployment
   extraVolumeMounts: []
-    #- mountPath: /tmp/foobar
+    # - mountPath: /tmp/foobar
     #  name: foobar
 
   # -- List of extra volumes to add to Dacha Deployment
   extraVolumes: []
-    #- name: foobar
+    # - name: foobar
     #  emptyDir: {}
 
 # ------------------------------------------------------------------------------- #
@@ -547,9 +547,9 @@ nats:
     name: featurehub
     replicas: 3
   topologyKeys: []
-    #- "kubernetes.io/hostname"
-    #- "topology.kubernetes.io/zone"
-    #- "topology.kubernetes.io/region"
+    # - "kubernetes.io/hostname"
+    # - "topology.kubernetes.io/zone"
+    # - "topology.kubernetes.io/region"
 
 # ------------------------------------------------------------------------------- #
 # PostgreSQL Helm Chart from Bitnami:
@@ -581,4 +581,3 @@ postgresql:
           GRANT ALL PRIVILEGES ON DATABASE featurehub TO featurehub;
           \connect featurehub
           GRANT ALL ON SCHEMA public TO featurehub;
-

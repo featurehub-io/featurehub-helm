@@ -68,9 +68,9 @@ spec:
             - configMapRef:
                 name: {{ include "featurehub.fullname" . }}-global-common-env
             {{- end }}
-            {{- if Values.global.envFromSecret}}
+            {{- if .Values.global.envFromSecret}}
             - secretRef:
-                name: {{ Values.global.envFromSecret }}
+                name: {{ .Values.global.envFromSecret }}
             {{- end }}
             {{- if .Values.managementRepository.environmentVars }}
             - configMapRef:
