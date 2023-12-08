@@ -3,6 +3,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "featurehub.edge.name" . }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
   labels:
     {{- include "featurehub.edge.labels" . | nindent 4 }}
 spec:

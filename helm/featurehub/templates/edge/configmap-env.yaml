@@ -3,6 +3,8 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "featurehub.fullname" . }}-edge-env
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
   labels:
     {{- include "featurehub.edge.labels" . | nindent 4 }}
 data:

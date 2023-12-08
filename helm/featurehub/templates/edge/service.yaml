@@ -3,6 +3,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "featurehub.edge.name" . }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "15"
   labels:
     {{- include "featurehub.edge.labels" . | nindent 4 }}
 spec:
@@ -17,7 +19,7 @@ spec:
       targetPort: metrics
       protocol: TCP
       name: metrics
-  {{- end }}  
+  {{- end }}
   selector:
     {{- include "featurehub.edge.selectorLabels" . | nindent 4 }}
 {{- end }}

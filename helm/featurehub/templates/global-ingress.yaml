@@ -7,6 +7,7 @@ metadata:
   labels:
   {{- with .Values.global.ingress.annotations }}
   annotations:
+    argocd.argoproj.io/sync-wave: "20"
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:

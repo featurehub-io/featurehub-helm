@@ -129,6 +129,8 @@ managementRepository:
     create: true
     # Annotations to add to the service account
     annotations: {}
+    # Labels to add to the service account
+    labels: {}
     # The name of the service account to use.
     # If not set and create is true, a name is generated using the fullname template
     name: ""
@@ -294,6 +296,8 @@ edge:
     create: true
     # Annotations to add to the service account
     annotations: {}
+    # Labels to add to the service account
+    labels: {}
     # The name of the service account to use.
     # If not set and create is true, a name is generated using the fullname template
     name: ""
@@ -433,6 +437,8 @@ dacha:
     create: true
     # Annotations to add to the service account
     annotations: {}
+    # Labels to add to the service account
+    labels: {}
     # The name of the service account to use.
     # If not set and create is true, a name is generated using the fullname template
     name: ""
@@ -547,9 +553,6 @@ nats:
     name: featurehub
     replicas: 3
   topologyKeys: []
-    # - "kubernetes.io/hostname"
-    # - "topology.kubernetes.io/zone"
-    # - "topology.kubernetes.io/region"
 
 # ------------------------------------------------------------------------------- #
 # PostgreSQL Helm Chart from Bitnami:

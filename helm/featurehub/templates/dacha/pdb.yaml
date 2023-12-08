@@ -4,6 +4,8 @@ apiVersion: {{ .Capabilities.APIVersions.Has "policy/v1" | ternary "policy/v1" "
 kind: PodDisruptionBudget
 metadata:
   name: {{ include "featurehub.dacha.name" . }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "22"
   labels:
     {{- include "featurehub.dacha.labels" . | nindent 4 }}
 spec:

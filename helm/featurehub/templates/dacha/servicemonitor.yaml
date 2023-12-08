@@ -4,6 +4,8 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: {{ include "featurehub.dacha.name" . }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "21"
   labels:
     {{- include "featurehub.dacha.labels" . | nindent 4 }}
     {{- with .Values.dacha.prometheus.labels }}
