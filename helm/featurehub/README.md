@@ -1,6 +1,6 @@
 # featurehub
 
-![Version: 4.0.8](https://img.shields.io/badge/Version-4.0.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.7.0](https://img.shields.io/badge/AppVersion-1.7.0-informational?style=flat-square)
+![Version: 4.0.9](https://img.shields.io/badge/Version-4.0.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.7.0](https://img.shields.io/badge/AppVersion-1.7.0-informational?style=flat-square)
 
 FeatureHub Release
 
@@ -14,7 +14,7 @@ FeatureHub Release
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://nats-io.github.io/k8s/helm/charts/ | nats | 0.19.6 |
+| https://nats-io.github.io/k8s/helm/charts/ | nats | 1.1.5 |
 | https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami | postgresql | 12.1.13 |
 
 ## Values
@@ -53,6 +53,7 @@ FeatureHub Release
 | dacha.securityContext.runAsUser | int | `999` |  |
 | dacha.serviceAccount.annotations | object | `{}` |  |
 | dacha.serviceAccount.create | bool | `true` |  |
+| dacha.serviceAccount.labels | object | `{}` |  |
 | dacha.serviceAccount.name | string | `""` |  |
 | dacha.strategy | object | `{}` |  |
 | dacha.tolerations | list | `[]` |  |
@@ -88,6 +89,7 @@ FeatureHub Release
 | edge.securityContext.runAsUser | int | `999` |  |
 | edge.serviceAccount.annotations | object | `{}` |  |
 | edge.serviceAccount.create | bool | `true` |  |
+| edge.serviceAccount.labels | object | `{}` |  |
 | edge.serviceAccount.name | string | `""` |  |
 | edge.strategy | object | `{}` |  |
 | edge.tolerations | list | `[]` |  |
@@ -138,6 +140,7 @@ FeatureHub Release
 | managementRepository.securityContext.runAsUser | int | `999` |  |
 | managementRepository.serviceAccount.annotations | object | `{}` |  |
 | managementRepository.serviceAccount.create | bool | `true` |  |
+| managementRepository.serviceAccount.labels | object | `{}` |  |
 | managementRepository.serviceAccount.name | string | `""` |  |
 | managementRepository.strategy | object | `{}` |  |
 | managementRepository.tolerations | list | `[]` |  |

@@ -20,6 +20,7 @@ metadata:
     {{- include "featurehub.edge.labels" . | nindent 4 }}
   {{- with .Values.edge.ingress.annotations }}
   annotations:
+    argocd.argoproj.io/sync-wave: "25"
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:

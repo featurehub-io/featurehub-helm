@@ -18,8 +18,9 @@ metadata:
   name: {{ include "featurehub.dacha.name" . }}
   labels:
     {{- include "featurehub.dacha.labels" . | nindent 4 }}
-  {{- with .Values.dacha.ingress.annotations }}
   annotations:
+    argocd.argoproj.io/sync-wave: "25"
+  {{- with .Values.dacha.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:

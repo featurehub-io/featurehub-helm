@@ -4,6 +4,8 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: {{ include "featurehub.edge.name" . }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "21"
   labels:
     {{- include "featurehub.edge.labels" . | nindent 4 }}
     {{- with .Values.edge.prometheus.labels }}
