@@ -1,5 +1,5 @@
 {{- if .Values.managementRepository.enabled }}
-{{- if and .Values.managementRepository.envAsApplicationProperties .Values.managementRepository.environmentVars }}
+{{- if .Values.managementRepository.envAsApplicationProperties }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -10,8 +10,15 @@ metadata:
     {{- include "featurehub.managementRepository.labels" . | nindent 4 }}
 data:
   application.properties: |-
+    monitor.port=8701
+    server.port=8085
+    run.nginx=true
+    dacha1.enabled=false
+    dacha2.enabled=true
 {{- range $key, $value := .Values.managementRepository.environmentVars }}
   {{- $key | nindent 4 }}={{ $value }}
 {{- end -}}
+  {{- include "google-pubsub-environment" . | nindent 4 }}
+  {{- include "google-pubsub-mr" . | nindent 4 }}
 {{- end -}}
 {{- end -}}

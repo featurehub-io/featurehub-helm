@@ -1,0 +1,70 @@
+# Default values for pubsub-emulator.
+
+image:
+  # -- repository to pull the emular from
+  repository: gcr.io/google.com/cloudsdktool/cloud-sdk
+  # -- image pull policy
+  pullPolicy: IfNotPresent
+  # -- Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+global:
+  # -- how many copies, this should generally only every be 1 but in case there is a need to change it
+  replicaCount: 1
+  # -- how much disk space to allocate to the data directory for pubsub to use
+  diskInMb: 5
+  # -- the name to give to the pubsub server
+  project: featurehub
+  # -- the port to use for pubsub server
+  port: 8075
+
+# -- if you need to provide a secret for your repository
+imagePullSecrets: []
+# -- if you want to change the name
+nameOverride: ""
+# -- if you want to change the full name
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# -- any annotations you wish to add to the pod
+podAnnotations: {}
+# -- any extra labels to give the pod
+podLabels: {}
+
+# -- any security context you wish to give the pod
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- any overall security context you wish to give
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  # -- what type of IP
+  type: ClusterIP
+  # -- override if you wish to have a different port than that which runs the pod
+  port: ""
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+

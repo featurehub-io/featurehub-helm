@@ -1,4 +1,5 @@
 {{- if .Values.edge.enabled }}
+{{- if not .Values.edge.envAsApplicationProperties }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -11,9 +12,13 @@ data:
 {{- with .Values.edge.environmentVars }}
   {{- toYaml . | nindent 2 }}
 {{- end }}
+  {{- include "google-pubsub-environment-env" . | nindent 2 }}
   monitor.port: "8701"
   server.port: "8553"
+  dacha1.enabled: "false"
+  dacha2.enabled: "true"
   {{- if ne .Values.global.urlPath "" }}
   featurehub.url-path: {{ .Values.global.urlPath | quote }}
   {{- end }}
+{{- end }}
 {{- end }}

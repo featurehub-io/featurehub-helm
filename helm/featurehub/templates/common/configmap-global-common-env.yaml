@@ -1,4 +1,4 @@
-{{- if .Values.global.environmentVars }}
+{{- if and (not .Values.global.envAsApplicationProperties) .Values.global.environmentVars }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

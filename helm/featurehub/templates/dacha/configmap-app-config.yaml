@@ -1,5 +1,5 @@
 {{- if .Values.dacha.enabled }}
-{{- if and .Values.dacha.envAsApplicationProperties .Values.dacha.environmentVars }}
+{{- if .Values.dacha.envAsApplicationProperties }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -10,8 +10,14 @@ metadata:
     {{- include "featurehub.dacha.labels" . | nindent 4 }}
 data:
   application.properties: |-
+    dacha1.enabled=false
+    dacha2.enabled=true
+    monitor.port=8701
+    server.port=8600
+
 {{- range $key, $value := .Values.dacha.environmentVars }}
   {{- $key | nindent 4 }}={{ $value }}
 {{- end -}}
+  {{- include "google-pubsub-environment" . | nindent 4 }}
 {{- end -}}
 {{- end -}}

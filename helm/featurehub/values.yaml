@@ -99,8 +99,10 @@ global:
         </Configuration>
 
 managementRepository:
+  # -- do you want to run the Management Repository?
   enabled: true
 
+  # -- how many copies
   replicaCount: 1
 
   strategy: {}
@@ -108,7 +110,7 @@ managementRepository:
 
   image:
     repository: featurehub/mr
-    tag: 1.7.0
+    tag: ""
 
   pullPolicy: IfNotPresent
 
@@ -149,20 +151,22 @@ managementRepository:
   # Note that `server.port` and `monitor.port` use their default values of `8085` and `8701` respectively, to make
   # it easier to implement the deployment, service and the prometheus serviceMonitor manifests.
   environmentVars:
+    # -- the connection string. Google CloudSQL libraries are included for Postgres and MySQL
     db.url: jdbc:postgresql://featurehub-postgresql:5432/featurehub
+    # -- the Database's Username
     db.username: featurehub
-    # normally you would not want this, but its for the postgres
+    # -- normally you would not want this, but its for the example postgres
     db.password: featurehub
+    # -- the maximum number of database connections that will be allowed
     db.connections: "20"
+    # -- when a Portfolio Admin group is created, this is added to the name of the portfolio. Change for a different language
     portfolio.admin.group.suffix: Administrators
-    dacha1.enabled: "false"
-    dacha2.enabled: "true"
 
   # -- If `true`, entries from `environmentVars` will be mapped to /etc/app-config/application.properties file
   # To mount secret settings as /etc/app-config/application.properties see volume fields
   # Used for retrocompatiblity with FeatureHub controller versions lower than 1.5.0
   # https://docs.featurehub.io/featurehub/latest/installation.html#_run_configuration
-  envAsApplicationProperties: false
+  envAsApplicationProperties: true
 
   # -- Extra environment variables to be exposed to management-repository deployment.
   # In terms of environment variable setting, this is the same as `environmentVars` field. The only difference
@@ -275,7 +279,7 @@ edge:
 
   image:
     repository: featurehub/edge
-    tag: 1.7.0
+    tag: ""
 
   pullPolicy: IfNotPresent
 
@@ -308,20 +312,30 @@ edge:
 
   affinity: {}
 
+  # -- If `true`, entries from `environmentVars` will be mapped to /etc/app-config/application.properties file
+  # To mount secret settings as /etc/app-config/application.properties see volume fields
+  # Used for retrocompatiblity with FeatureHub controller versions lower than 1.5.0
+  # https://docs.featurehub.io/featurehub/latest/installation.html#_run_configuration
+  envAsApplicationProperties: true
+
   # -- Environment variables to be exposed to edge deployment.
   # As of 1.5.0 all FeatureHub controller properties are available as environment variables using the same case.
   # Entries accepted here are the same as would be specified in /etc/app-config/applications.properties.
   # Note that `server.port` and `monitor.port` use their default values of `8085` and `8701` respectively, to make
   # it easier to implement the deployment, service and the prometheus serviceMonitor manifests.
   environmentVars:
+    # -- how long SSE connections are allowed to connect for
     maxSlots: "30"
+    # -- thread pool for updates
     update.pool-size: "30"
+    # -- thread pool for processing incoming requests. Does not reflect number of clients
     listen.pool-size: "30"
+    # -- how long to wait for connections to complete before shutting server down
     server.gracePeriodInSeconds: "10"
+    # -- the location of your dacha service, along with the port
     dacha.url.default: http://featurehub-dacha:8600
-    dacha1.enabled: "false"
-    dacha2.enabled: "true"
-    dacha.timeout.read: "12000"  # this should reflect the sizing/capability of your database to respond to the 1st time a key is requested
+    # -- this should reflect the sizing/capability of your database to respond to the 1st time a key is requested
+    dacha.timeout.read: "12000"
 
 
   # -- If `true`, entries from `environmentVars` and `envFromSecret` fields will be mapped to configuration files.
@@ -414,9 +428,15 @@ dacha:
   strategy: {}
     # type: RollingUpdate
 
+  # -- If `true`, entries from `environmentVars` will be mapped to /etc/app-config/application.properties file
+  # To mount secret settings as /etc/app-config/application.properties see volume fields
+  # Used for retrocompatiblity with FeatureHub controller versions lower than 1.5.0
+  # https://docs.featurehub.io/featurehub/latest/installation.html#_run_configuration
+  envAsApplicationProperties: true
+
   image:
     repository: featurehub/dacha2
-    tag: 1.7.0
+    tag: ""
 
   pullPolicy: IfNotPresent
 
@@ -455,10 +475,9 @@ dacha:
   # Note that `server.port` and `monitor.port` use their default values of `8085` and `8701` respectively, to make
   # it easier to implement the deployment, service and the prometheus serviceMonitor manifests.
   environmentVars:
+    # --  thread pool size for processing cache updates
     cache.pool-size: "10"
-    dacha1.enabled: "false"
-    dacha2.enabled: "true"
-    # Dacha2 calls MR via the Management API to avoid public internet traffic (by default)
+    # --  Dacha2 calls MR via the Management API to avoid public internet traffic (by default)
     management-repository.url: "http://featurehub-management-repository:8701"
 
   # -- If `true`, entries from `environmentVars` and `envFromSecret` fields will be mapped to configuration files.
@@ -541,6 +560,49 @@ dacha:
   extraVolumes: []
     # - name: foobar
     #  emptyDir: {}
+
+googlepubsub:
+  # -- whether to enable chart for using Google PubSub
+  enabled: false
+  # -- how long to backoff when failing to process a request from an incoming subscription
+  backOffInSeconds: 20
+  # -- is the pubsub implementation a copy of the Docker emulator
+  emulator:
+    enabled: true
+    host: "pubsub-emulator:8075"
+  project: featurehub
+  # -- feed these from something like Terraform, Pulumi or a Crossplane XRD. For more details see [PubSub config docs](https://docs.featurehub.io/featurehub/latest/configuration.html#_googles_pubsub)
+  channels:
+    featureEnricher:
+      description: "This channel is used for the initial enriched events. It is a queue."
+      # -- MR publishes this.
+      topicName: "enricher-updates-sub"
+      # -- dacha is listening to this
+      subscription: "enricher-updates-sub"
+    featureWebhook:
+      description: "dacha broadcasts to the topic, edge listens"
+      topicName: "featurehub-enriched-events-webhooks"
+      subscription: "featurehub-enriched-events"
+    featureChangeMessage:
+      description: "this is issued when a feature has changed, it is a complex diff message. It may or may not be enabled"
+      topicName: "featurehub-messaging-channel"
+    mrdacha:
+      topicName: "featurehub-mr-dacha2"
+      # this is the prefix name used for the dynamically created subscription for Dacha
+      dachaPrefix: "featurehub-dacha2-listener"
+    mredge:
+      topicName: "featurehub-mr-edge"
+      # this is the prefix name used for the dynamically created subscription for Edge
+      edgePrefix: "featurehub-edge-listener"
+    edgemr:
+      description: "Updates from Edge are published through this channel and picked up by MR"
+      topicName: "featurehub-edge-updates"
+      # MR listens to these updates from Edge
+      subscription: "enricher-updates-sub"
+    stats:
+      topicName: "featurehub-stats"
+    enrichedEvents:
+      topicName: "enriched-feature-data"
 
 # ------------------------------------------------------------------------------- #
 # NATS Helm Chart from Bitnami
