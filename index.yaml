@@ -3,6 +3,40 @@ entries:
   featurehub:
   - apiVersion: v2
     appVersion: 1.7.0
+    created: "2023-12-09T20:47:04.755436389Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
+      version: 12.1.13
+    - condition: nats.enabled
+      name: nats
+      repository: https://nats-io.github.io/k8s/helm/charts/
+      version: 1.1.5
+    description: 'FeatueHub is an Enterprise Grade, Cloud Native Feature Management
+      platform that is available to suite any organisations requirements. This fully
+      supported Helm chart is the Open Source version of the product, which has all
+      the same features as the [SaaS product](https://app.featurehub.io).  The project
+      is hosted on [Github](https://github.com/featurehub-io/featurehub). It supports
+      Postgres, MySQL, MariaDB or Oracle Database deployments, and uses NATS or Google
+      PubSub as a streaming layer. Kinesis is available but has limited testing. Documentation
+      on configuration is provided on [Featurehub Docs](https://docs.featurehub.io/featurehub/latest/configuration.html)  NATS
+      and Postgres are *NOT* requirements of the project and are included only for
+      evaluation convenience and evaluation. It is expected people will install their
+      own requirements. '
+    digest: 434a4143465ae156e5dacfcbbeaee7e7bf45b8d4bb6f22126120686af3c213ca
+    icon: https://raw.githubusercontent.com/featurehub-io/featurehub/main/docs/modules/ROOT/images/fh_icon.png
+    maintainers:
+    - email: info@featurehub.io
+      name: FeatureHub
+      url: https://github.com/featurehub-io/featurehub-helm
+    name: featurehub
+    type: application
+    urls:
+    - https://github.com/featurehub-io/featurehub-helm/releases/download/featurehub-4.1.0/featurehub-4.1.0.tgz
+    version: 4.1.0
+  - apiVersion: v2
+    appVersion: 1.7.0
     created: "2023-12-08T05:48:12.288115667Z"
     dependencies:
     - condition: postgresql.enabled
@@ -267,4 +301,17 @@ entries:
     urls:
     - https://github.com/featurehub-io/featurehub-helm/releases/download/featurehub-3.0.4/featurehub-3.0.4.tgz
     version: 3.0.4
-generated: "2023-12-08T05:48:12.288659593Z"
+  pubsub-emulator:
+  - apiVersion: v2
+    appVersion: 398.0.0
+    created: "2023-12-09T20:47:04.872046299Z"
+    description: This is a helm chart for the pubsub emulator, which is useful for
+      testing charts against. It is unsupported, so please do not raise issues against
+      it. We do accept PRs however to improve it if you wish.
+    digest: 62c06207c09e8cac38bd76202477986fec5efd9a3bc29e612e3dfb819a3eecfd
+    name: pubsub-emulator
+    type: application
+    urls:
+    - https://github.com/featurehub-io/featurehub-helm/releases/download/pubsub-emulator-1.0.0/pubsub-emulator-1.0.0.tgz
+    version: 1.0.0
+generated: "2023-12-09T20:47:04.872163688Z"
