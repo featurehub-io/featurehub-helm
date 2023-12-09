@@ -1,0 +1,2 @@
+#!/bin/sh
+helm upgrade -i featurehub featurehub --set dacha.envAsApplicationProperties=false,edge.envAsApplicationProperties=false,managementRepository.envAsApplicationProperties=false,nats.enabled=true,googlepubsub.enabled=false --namespace featurehub

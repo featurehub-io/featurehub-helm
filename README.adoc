@@ -16,7 +16,16 @@ these instructions. Without modification of the values in the charts, it is not 
 
 Please feel free to visit our https://docs.featurehub.io[documentation] for further information.
 
-== Steps
+== Local Development/Testing
+
+The helm chart on the kind cluster installs with a default of Postgres and NATs. There
+are deploy scripts for using both, but a simple
+
+ $ helm upgrade -i featurehub featurehub -n featurehub
+
+will work as long as the other kinD dependencies are installed. Below are the setup
+instructions for ensuring that kinD is installed and configured correctly (it needs
+an ingress running on port 80) before installing the charts.
 
 === 1. Install KinD
 
@@ -130,6 +139,24 @@ If there is something wrong with the health check of a service, then the logs sh
 out exactly what is wrong, and so should the endpoint.
 
 == Changelog [[changelog]]
+
+=== 4.1.0
+- support Google Pub/Sub configuration (including local dev)
+- clearly delineate application params vs env var based deployment
+- add better documentation and links
+- annotate for all fields so helmdocs pics up docs
+- add changelog
+
+=== 4.0.9
+- Upgrade to support NATS
+- Upgrade to support Sync Waves for ArgoCD
+
+=== 4.0.8
+- Ensure chart is properly tested
+- Fix values issue with env vars as secrets
+
+=== 4.0.7
+- Introduce env vars as secrets
 
 === 4.0.6
 

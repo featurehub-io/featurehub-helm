@@ -1,13 +1,24 @@
 apiVersion: v2
 name: featurehub
-description: FeatureHub Release
+description: "FeatueHub is an Enterprise Grade, Cloud Native Feature Management platform that is available to suite any organisations requirements.
+  This fully supported Helm chart is the Open Source version of the product, which has all the same features as the [SaaS product](https://app.featurehub.io).
+
+
+  The project is hosted on [Github](https://github.com/featurehub-io/featurehub). It supports Postgres, MySQL, MariaDB or Oracle Database deployments, and uses
+  NATS or Google PubSub as a streaming layer. Kinesis is available but has limited testing. Documentation on configuration is provided on [Featurehub Docs](https://docs.featurehub.io/featurehub/latest/configuration.html)
+
+
+  NATS and Postgres are *NOT* requirements of the project and are included only for evaluation convenience and evaluation. It is expected people will install
+  their own requirements.
+  "
 type: application
-version: 4.0.9
+version: 4.1.0
 icon: https://raw.githubusercontent.com/featurehub-io/featurehub/main/docs/modules/ROOT/images/fh_icon.png
 appVersion: "1.7.0"
 maintainers:
   - name: FeatureHub
     email: info@featurehub.io
+    url: https://github.com/featurehub-io/featurehub-helm
 dependencies:
   - name: postgresql
     version: 12.1.13

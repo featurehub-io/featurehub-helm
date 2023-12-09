@@ -1,0 +1,6 @@
+#!/bin/sh
+rm -rf gen_templates
+helm template --debug featurehub featurehub --output-dir gen_templates/app_props_nats --namespace test-namespace -f test-values.yaml --set dacha.envAsApplicationProperties=true,edge.envAsApplicationProperties=true,managementRepository.envAsApplicationProperties=true,nats.enabled=true,googlepubsub.enabled=false
+helm template --debug featurehub featurehub --output-dir gen_templates/envs_nats --namespace test-namespace -f test-values.yaml --set dacha.envAsApplicationProperties=false,edge.envAsApplicationProperties=false,managementRepository.envAsApplicationProperties=false,nats.enabled=true,googlepubsub.enabled=false
+helm template --debug featurehub featurehub --output-dir gen_templates/envs_pubsub --namespace test-namespace -f test-values.yaml --set dacha.envAsApplicationProperties=true,edge.envAsApplicationProperties=true,managementRepository.envAsApplicationProperties=true,nats.enabled=false,googlepubsub.enabled=true
+helm template --debug featurehub featurehub --output-dir gen_templates/app_props_pubsub --namespace test-namespace -f test-values.yaml --set dacha.envAsApplicationProperties=false,edge.envAsApplicationProperties=false,managementRepository.envAsApplicationProperties=false,nats.enabled=false,googlepubsub.enabled=true

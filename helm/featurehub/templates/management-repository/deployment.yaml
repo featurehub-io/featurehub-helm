@@ -64,9 +64,9 @@ spec:
           {{- end }}
           image: "{{ .Values.managementRepository.image.repository }}:{{ .Values.managementRepository.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.pullPolicy }}
-          {{- if or (.Values.global.environmentVars) (.Values.global.envFromSecret) (.Values.managementRepository.environmentVars) (.Values.managementRepository.envFromSecret) }}
+          {{- if or (and .Values.global.environmentVars (not .Values.global.envAsApplicationProperties)) (.Values.global.envFromSecret) (not .Values.managementRepository.envAsApplicationProperties) (.Values.managementRepository.envFromSecret) }}
           envFrom:
-            {{- if .Values.global.environmentVars }}
+            {{- if and .Values.global.environmentVars (not .Values.global.envAsApplicationProperties) }}
             - configMapRef:
                 name: {{ include "featurehub.fullname" . }}-global-common-env
             {{- end }}
@@ -74,7 +74,7 @@ spec:
             - secretRef:
                 name: {{ .Values.global.envFromSecret }}
             {{- end }}
-            {{- if .Values.managementRepository.environmentVars }}
+            {{- if not .Values.managementRepository.envAsApplicationProperties }}
             - configMapRef:
                 name: {{ include "featurehub.fullname" . }}-management-repository-env
             {{- end }}
@@ -123,7 +123,7 @@ spec:
             - mountPath: /etc/common-config
               name: common-config-empty
           {{- end }}
-          {{- if and .Values.managementRepository.envAsApplicationProperties .Values.managementRepository.environmentVars }}
+          {{- if .Values.managementRepository.envAsApplicationProperties }}
             - mountPath: /etc/app-config/application.properties
               name: app-config
               subPath: application.properties

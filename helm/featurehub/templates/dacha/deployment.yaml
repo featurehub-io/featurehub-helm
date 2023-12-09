@@ -56,9 +56,9 @@ spec:
             {{- toYaml .Values.dacha.securityContext | nindent 12 }}
           image: "{{ .Values.dacha.image.repository }}:{{ .Values.dacha.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.dacha.pullPolicy }}
-          {{- if or (.Values.global.environmentVars) (.Values.global.envFromSecret) (.Values.dacha.environmentVars) (.Values.dacha.envFromSecret) }}
+          {{- if or (and (not .Values.global.envAsApplicationProperties) .Values.global.environmentVars) (not .Values.dacha.envAsApplicationProperties) (.Values.global.envFromSecret) (.Values.dacha.envFromSecret) }}
           envFrom:
-            {{- if .Values.global.environmentVars }}
+            {{- if and (not .Values.global.envAsApplicationProperties) .Values.global.environmentVars }}
             - configMapRef:
                 name: {{ include "featurehub.fullname" . }}-global-common-env
             {{- end }}
@@ -66,7 +66,7 @@ spec:
             - secretRef:
                 name: {{ .Values.global.envFromSecret }}
             {{- end }}
-            {{- if .Values.dacha.environmentVars }}
+            {{- if not .Values.dacha.envAsApplicationProperties }}
             - configMapRef:
                 name: {{ include "featurehub.fullname" . }}-dacha-env
             {{- end }}
@@ -152,7 +152,7 @@ spec:
         - name: common-config-empty
           emptyDir: {}
       {{- end }}
-      {{- if and .Values.dacha.envAsApplicationProperties .Values.dacha.environmentVars }}
+      {{- if .Values.dacha.envAsApplicationProperties }}
         - name: app-config
           configMap:
             name: {{ include "featurehub.fullname" . }}-dacha-app-config

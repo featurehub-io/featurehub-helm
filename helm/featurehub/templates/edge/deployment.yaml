@@ -56,9 +56,9 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.edge.image.repository }}:{{ .Values.edge.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.pullPolicy }}
-          {{- if or (.Values.global.environmentVars) (.Values.global.envFromSecret) (.Values.edge.environmentVars) (.Values.edge.envFromSecret) }}
+          {{- if or (and .Values.global.environmentVars (not .Values.global.envAsApplicationProperties)) (.Values.global.envFromSecret) (not .Values.edge.envAsApplicationProperties) (.Values.edge.envFromSecret) }}
           envFrom:
-            {{- if .Values.global.environmentVars }}
+            {{- if and .Values.global.environmentVars (not .Values.global.envAsApplicationProperties) }}
             - configMapRef:
                 name: {{ include "featurehub.fullname" . }}-global-common-env
             {{- end }}
@@ -66,7 +66,7 @@ spec:
             - secretRef:
                 name: {{ .Values.global.envFromSecret }}
             {{- end }}
-            {{- if .Values.edge.environmentVars }}
+            {{- if not .Values.edge.envAsApplicationProperties }}
             - configMapRef:
                 name: {{ include "featurehub.fullname" . }}-edge-env
             {{- end }}
@@ -115,7 +115,7 @@ spec:
             - mountPath: /etc/common-config
               name: common-config-empty
           {{- end }}
-          {{- if and .Values.edge.envAsApplicationProperties .Values.edge.environmentVars }}
+          {{- if .Values.edge.envAsApplicationProperties }}
             - mountPath: /etc/app-config/application.properties
               name: app-config
               subPath: application.properties

@@ -1,0 +1,8 @@
+apiVersion: v2
+name: pubsub-emulator
+description: "This is a helm chart for the pubsub emulator, which is useful for testing charts against. It is unsupported,
+  so please do not raise issues against it. We do accept PRs however to improve it if you wish."
+
+type: application
+version: 1.0.0
+appVersion: "398.0.0"
