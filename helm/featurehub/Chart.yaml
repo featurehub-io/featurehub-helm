@@ -8,11 +8,11 @@ description: "FeatueHub is an Enterprise Grade, Cloud Native Feature Management 
   NATS or Google PubSub as a streaming layer. Kinesis is available but has limited testing. Documentation on configuration is provided on [Featurehub Docs](https://docs.featurehub.io/featurehub/latest/configuration.html)
 
 
-  NATS and Postgres are *NOT* requirements of the project and are included only for evaluation convenience and evaluation. It is expected people will install
+  NATS and Postgres are *NOT* requirements of the project and are included only for convenience and evaluation. It is expected people will install
   their own requirements.
   "
 type: application
-version: 4.1.0
+version: 4.1.1
 icon: https://raw.githubusercontent.com/featurehub-io/featurehub/main/docs/modules/ROOT/images/fh_icon.png
 appVersion: "1.7.0"
 maintainers:
