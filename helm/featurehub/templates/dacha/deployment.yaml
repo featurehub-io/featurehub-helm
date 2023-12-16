@@ -38,7 +38,10 @@ spec:
         {{- end }}
 
         {{- range $key, $value := .Values.dacha.podAnnotations }}
-        {{ $key }}: {{ $value}}
+        {{ $key | quote }}: {{ $value | quote }}
+        {{- end }}
+        {{- range $key, $value := .Values.podAnnotations }}
+        {{ $key | quote }}: {{ $value | quote }}
         {{- end }}
       labels:
         {{- include "featurehub.dacha.selectorLabels" . | nindent 8 }}

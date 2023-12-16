@@ -37,8 +37,11 @@ spec:
         checksum/global-common-config-extra: {{ include (print $.Template.BasePath "/common/configmap-global-common-config-extra.yaml") . | sha256sum }}
         {{- end }}
 
+        {{- range $key, $value := .Values.managementRepository.podAnnotations }}
+        {{ $key | quote }}: {{ $value | quote }}
+        {{- end }}
         {{- range $key, $value := .Values.podAnnotations }}
-        {{ $key }}: {{ $value}}
+        {{ $key | quote }}: {{ $value | quote }}
         {{- end }}
       labels:
         {{- include "featurehub.managementRepository.selectorLabels" . | nindent 8 }}

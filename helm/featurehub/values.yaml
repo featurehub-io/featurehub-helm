@@ -3,6 +3,8 @@
 
 nameOverride: ""
 fullnameOverride: ""
+podAnnotations: {}
+
 
 # global sections are normally reserved for cross application configuration, where multiple apps are in the repository,
 # we should generally not use this section
