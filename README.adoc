@@ -1,20 +1,20 @@
 = Helm
 
-We publish helm charts to https://artifacthub.io/packages/search?repo=featurehub[image:https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/featurehub[Artifact HUB]].
+https://artifacthub.io/packages/search?repo=featurehub[image:https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/featurehub[Artifact HUB]].
 
-NOTE: If you are coming from an earlier version, please read the <<changelog>>.
+<<changelog>>
 
 == Deploying FeatureHub on Kubernetes
+
+Helm chart is designed to support FeatureHub's most scalable deployment option (REST + Streaming real-time feature updates). Read more about it https://docs.featurehub.io/featurehub/1.7.2/installation.html#_option_2a_scalable_deployment_streaming_rest_feature_updates[here] 
 
 These instructions are designed to get you up and running on a local kubernetes running on KinD. They will be
 fleshed out over time as we have these examples running on Google's GKE/Autopilot, AWS's EKS/Fargate, and Azure's
 AKS.
 
 NOTE: This set of Helm charts is designed to be run the local kinD cluster and be fully operable by anyone following
-these instructions. Without modification of the values in the charts, it is not intended to be production ready just
-"go". That said, considerable effort has been put in by contributors to make this as easy to adapt to your needs as possible.
+these instructions. Please note, you will likely need to modify certain values in the chart to suit your production needs.
 
-Please feel free to visit our https://docs.featurehub.io[documentation] for further information.
 
 == Local Development/Testing
 
@@ -111,24 +111,24 @@ all traffic routing into your namespace will go through that ingress and be rout
 This means default traffic to MR and /features to Edge - Dacha never receives edge traffic.
 
 All services generally have a separate monitoring and server port, as per the docs - MR is 8701 for
-monitoring, 8085 for the server. It does this to ensure your liveness and prometheus traffic endpoints
+monitoring, 8085 for the server. This is to ensure your liveness and prometheus traffic endpoints
 aren't exposed to the world.
 
-If your services aren't coming up - and you have modified these charts, its likely because the
+If your services aren't coming up and you have modified the chart, its likely because the
 port configuration is wrong.
 
-You will need to find a pod (unless you have enabled prometheus on the MR, in which case you
-get a service endpoint for it). So e.g.
+You will need to find a pod (unless you have enabled Prometheus on the MR, in which case you
+get a service endpoint for it). For example:
 
  $ kubectl get pods
 
-to find a pod and then
+and then port-forward 
 
-The management port is exposed on a service, so:
+The management port is exposed on a service:
 
  $ kubectl port-forward featurehub-management-repository-bf8b79d4d-2pkdl 8701
 
-A curl to it:
+A curl to check it's health:
 
 ----
 curl  localhost:8701
