@@ -11,6 +11,9 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  {{- if .Values.global.ingress.ingressClassName }}
+  ingressClassName: "{{ .Values.global.ingress.ingressClassName }}"
+  {{- end }}
   rules:
     - http:
         paths:
