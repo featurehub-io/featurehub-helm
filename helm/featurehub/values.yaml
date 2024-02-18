@@ -321,6 +321,27 @@ edge:
     #   cpu: 100m
     #   memory: 128Mi
 
+  # -- this allows you to override the values of the liveness probe for edge
+  livenessProbe:
+    initialDelaySeconds: 20
+    periodSeconds: 20
+    failureThreshold: 2
+    timeoutSeconds: 3
+    httpGet:
+      path: "/health/liveness"
+      port: metrics
+
+  # -- this allows you to override the readiness probe for edge
+  readinessProbe:
+    initialDelaySeconds: 20
+    periodSeconds: 20
+    successThreshold: 2
+    failureThreshold: 2
+    timeoutSeconds: 3
+    httpGet:
+      path: "/health/readiness"
+      port: metrics
+
   serviceAccount:
     # Specifies whether a service account should be created
     create: true
@@ -477,6 +498,27 @@ dacha:
     # requests:
     #   cpu: 100m
     #   memory: 128Mi
+
+  # -- this allows you to override the values of the liveness probe for dacha
+  livenessProbe:
+    initialDelaySeconds: 20
+    periodSeconds: 20
+    failureThreshold: 1  # we set this to 1 because if the health check fails, it means the cache is compromised
+    timeoutSeconds: 3
+    httpGet:
+      path: /health/liveness
+      port: metrics
+
+  # -- this allows you to override the values of the readiness probe for dacha
+  readinessProbe:
+    initialDelaySeconds: 20
+    periodSeconds: 20
+    successThreshold: 2
+    failureThreshold: 1
+    timeoutSeconds: 3
+    httpGet:
+      path: /health/readiness
+      port: metrics
 
   serviceAccount:
     # Specifies whether a service account should be created
