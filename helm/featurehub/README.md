@@ -45,6 +45,7 @@ NATS and Postgres are *NOT* requirements of the project and are included only fo
 | dacha.ingress.enabled | bool | `false` |  |
 | dacha.ingress.hosts | list | `[]` |  |
 | dacha.ingress.tls | list | `[]` |  |
+| dacha.livenessProbe | object | `{"failureThreshold":1,"httpGet":{"path":"/health/liveness","port":"metrics"},"initialDelaySeconds":20,"periodSeconds":20,"timeoutSeconds":3}` | this allows you to override the values of the liveness probe for dacha |
 | dacha.nodeSelector | object | `{}` |  |
 | dacha.podAnnotations | object | `{}` |  |
 | dacha.podDisruptionBudget.enabled | bool | `true` |  |
@@ -54,6 +55,7 @@ NATS and Postgres are *NOT* requirements of the project and are included only fo
 | dacha.prometheus.enabled | bool | `false` | Whether to enable or disable prometheus metrics endpoints, and serviceMonitor If enabled, metrics are exposed on port 8701, on /metrics endpoint |
 | dacha.prometheus.labels | object | `{}` | Labels for the Prometheus Operator to handle the serviceMonitor |
 | dacha.pullPolicy | string | `"IfNotPresent"` |  |
+| dacha.readinessProbe | object | `{"failureThreshold":1,"httpGet":{"path":"/health/readiness","port":"metrics"},"initialDelaySeconds":20,"periodSeconds":20,"successThreshold":2,"timeoutSeconds":3}` | this allows you to override the values of the readiness probe for dacha |
 | dacha.replicaCount | int | `2` |  |
 | dacha.resources | object | `{}` |  |
 | dacha.securityContext.runAsNonRoot | bool | `true` |  |
@@ -88,6 +90,7 @@ NATS and Postgres are *NOT* requirements of the project and are included only fo
 | edge.ingress.enabled | bool | `false` |  |
 | edge.ingress.hosts | list | `[]` |  |
 | edge.ingress.tls | list | `[]` |  |
+| edge.livenessProbe | object | `{"failureThreshold":2,"httpGet":{"path":"/health/liveness","port":"metrics"},"initialDelaySeconds":20,"periodSeconds":20,"timeoutSeconds":3}` | this allows you to override the values of the liveness probe for edge |
 | edge.nodeSelector | object | `{}` |  |
 | edge.podAnnotations | object | `{}` |  |
 | edge.podDisruptionBudget.enabled | bool | `true` |  |
@@ -97,6 +100,7 @@ NATS and Postgres are *NOT* requirements of the project and are included only fo
 | edge.prometheus.enabled | bool | `false` | Whether to enable or disable prometheus metrics endpoints, and serviceMonitor If enabled, metrics are exposed on port 8701, on /metrics endpoint |
 | edge.prometheus.labels | object | `{}` | Labels for the Prometheus Operator to handle the serviceMonitor |
 | edge.pullPolicy | string | `"IfNotPresent"` |  |
+| edge.readinessProbe | object | `{"failureThreshold":2,"httpGet":{"path":"/health/readiness","port":"metrics"},"initialDelaySeconds":20,"periodSeconds":20,"successThreshold":2,"timeoutSeconds":3}` | this allows you to override the readiness probe for edge |
 | edge.replicaCount | int | `2` |  |
 | edge.resources | object | `{}` |  |
 | edge.securityContext.runAsNonRoot | bool | `true` |  |
@@ -119,6 +123,7 @@ NATS and Postgres are *NOT* requirements of the project and are included only fo
 | global.extraVolumes | list | `[]` | List of extra volumes to add to Management Repository Deployment |
 | global.ingress.annotations | list | `[]` |  |
 | global.ingress.enabled | bool | `true` |  |
+| global.ingress.ingressClassName | string | `""` | specify the ingress class name if thats what makes yor ingress work. E.g. in AWS its "alb" |
 | global.intranet | bool | `false` | if set to true, then MR will serve the intranet version of the application which does not require external HTML dependencies |
 | global.urlPath | string | `""` | the default url path is to mount as root, this lets you mount where ever you like, but it affects the health checks |
 | googlepubsub.backOffInSeconds | int | `20` | how long to backoff when failing to process a request from an incoming subscription |
@@ -151,6 +156,7 @@ NATS and Postgres are *NOT* requirements of the project and are included only fo
 | managementRepository.ingress.hosts | list | `[]` |  |
 | managementRepository.ingress.tls | list | `[]` |  |
 | managementRepository.initContainers | object | `{}` |  |
+| managementRepository.livenessProbe | object | `{"failureThreshold":2,"httpGet":{"path":"/health/liveness","port":"metrics"},"initialDelaySeconds":20,"periodSeconds":20,"timeoutSeconds":3}` | this allows you to override the values of the liveness probe for MR |
 | managementRepository.nodeSelector | object | `{}` |  |
 | managementRepository.podAnnotations | object | `{}` |  |
 | managementRepository.podDisruptionBudget.enabled | bool | `true` |  |
@@ -160,6 +166,7 @@ NATS and Postgres are *NOT* requirements of the project and are included only fo
 | managementRepository.prometheus.enabled | bool | `false` | Whether to enable or disable prometheus metrics endpoints, and serviceMonitor If enabled, metrics are exposed on port 8701, on /metrics endpoint |
 | managementRepository.prometheus.labels | object | `{}` | Labels for the Prometheus Operator to handle the serviceMonitor |
 | managementRepository.pullPolicy | string | `"IfNotPresent"` |  |
+| managementRepository.readinessProbe | object | `{"failureThreshold":2,"httpGet":{"path":"/health/readiness","port":"metrics"},"initialDelaySeconds":20,"periodSeconds":20,"successThreshold":2,"timeoutSeconds":3}` | this allows you to override the readiness probe |
 | managementRepository.replicaCount | int | `1` | how many copies |
 | managementRepository.resources | object | `{}` |  |
 | managementRepository.securityContext.runAsNonRoot | bool | `true` |  |
@@ -176,4 +183,4 @@ NATS and Postgres are *NOT* requirements of the project and are included only fo
 | postgresql | object | `{"enabled":true,"global":{"postgresql":{"auth":{"postgresPassword":"postgresql"}}},"primary":{"initdb":{"scripts":{"featurehub.sql":"CREATE USER featurehub PASSWORD 'featurehub' LOGIN;\nCREATE DATABASE featurehub;\nGRANT ALL PRIVILEGES ON DATABASE featurehub TO featurehub;\n\\connect featurehub\nGRANT ALL ON SCHEMA public TO featurehub;"}},"persistence":{"accessModes":["ReadWriteOnce"],"enabled":true,"size":"128Mi","storageClassName":"standard"}}}` | ----------------------------------------------------------------------------- # |
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.11.3](https://github.com/norwoodj/helm-docs/releases/v1.11.3)
+Autogenerated from chart metadata using [helm-docs v1.13.0](https://github.com/norwoodj/helm-docs/releases/v1.13.0)
