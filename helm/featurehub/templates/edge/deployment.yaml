@@ -86,22 +86,9 @@ spec:
               containerPort: 8701
               protocol: TCP
           livenessProbe:
-            initialDelaySeconds: 20
-            periodSeconds: 20
-            failureThreshold: 2
-            timeoutSeconds: 3
-            httpGet:
-              path: {{ include "featurehub.liveness.url" . | quote }}
-              port: metrics
+            {{- toYaml .Values.edge.livenessProbe | nindent 12 }}
           readinessProbe:
-            initialDelaySeconds: 20
-            periodSeconds: 20
-            successThreshold: 2
-            failureThreshold: 2
-            timeoutSeconds: 3
-            httpGet:
-              path: {{ include "featurehub.readiness.url" . | quote }}
-              port: metrics
+            {{- toYaml .Values.edge.readinessProbe | nindent 12 }}
           volumeMounts:
           {{- if gt ( len .Values.global.extraCommonConfigFiles ) 0 -}}
           {{- range $cm := .Values.global.extraCommonConfigFiles }}

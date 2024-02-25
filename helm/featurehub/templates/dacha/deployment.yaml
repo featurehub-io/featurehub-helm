@@ -86,22 +86,9 @@ spec:
               containerPort: 8701
               protocol: TCP
           livenessProbe:
-            initialDelaySeconds: 20
-            periodSeconds: 20
-            failureThreshold: 1  # we set this to 1 because if the health check fails, it means the cache is compromised
-            timeoutSeconds: 3
-            httpGet:
-              path: /health/liveness
-              port: metrics
+            {{- toYaml .Values.dacha.livenessProbe | nindent 12 }}
           readinessProbe:
-            initialDelaySeconds: 20
-            periodSeconds: 20
-            successThreshold: 2
-            failureThreshold: 1
-            timeoutSeconds: 3
-            httpGet:
-              path: /health/readiness
-              port: metrics
+            {{- toYaml .Values.dacha.readinessProbe | nindent 12 }}
           volumeMounts:
           {{- if gt ( len .Values.global.extraCommonConfigFiles ) 0 -}}
           {{- range $cm := .Values.global.extraCommonConfigFiles }}

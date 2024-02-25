@@ -12,7 +12,7 @@ description: "FeatueHub is an Enterprise Grade, Cloud Native Feature Management 
   their own requirements.
   "
 type: application
-version: 4.1.1
+version: 4.1.2
 icon: https://raw.githubusercontent.com/featurehub-io/featurehub/main/docs/modules/ROOT/images/fh_icon.png
 appVersion: "1.7.0"
 maintainers:

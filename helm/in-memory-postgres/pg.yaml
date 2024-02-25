@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: postgres
+  template:
+    metadata:
+      labels:
+        run: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres
+          env:
+            - name: POSTGRES_PASSWORD
+              value: featurehub
+            - name: POSTGRES_HOST_AUTH_METHOD
+              value: trust
+          ports:
+            - name: tcp
+              containerPort: 5432
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: featurehub-postgresql
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP
+      name: postgres
+  selector:
+    run: postgres
