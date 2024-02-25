@@ -47,9 +47,10 @@ jobs:
           done
 
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.4.1
+        uses: helm/chart-releaser-action@v1.6.0
         with:
-          charts_dir: helm
+          skip_existing: true
+          charts_dir: helm/featurehub
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
