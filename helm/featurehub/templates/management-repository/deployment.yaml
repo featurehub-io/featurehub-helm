@@ -45,6 +45,8 @@ spec:
         {{- end }}
       labels:
         {{- include "featurehub.managementRepository.selectorLabels" . | nindent 8 }}
+        {{- include "featurehub.podlabels" .Values.managementRepository.podLabels | nindent 8 }}
+        {{- include "featurehub.globalPodlabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:

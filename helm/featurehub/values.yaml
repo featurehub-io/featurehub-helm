@@ -28,6 +28,9 @@ global:
   # Entries of the secret specified here are the same as would be specified in /etc/app-config/secrets.properties
   envFromSecret: ""
 
+  # -- this allows you to specify pod labels that will appear on all deployments
+  podLabels: {}
+
   # This is only used for the short-cut KinD ingress, you would not use this in your own cluster
   ingress:
     enabled: true
@@ -111,6 +114,9 @@ managementRepository:
 
   strategy: {}
     # type: RollingUpdate
+
+  # -- this allows you to specify pod labels that will appear on MR deployments
+  podLabels: {}
 
   image:
     repository: featurehub/mr
@@ -303,6 +309,9 @@ edge:
   strategy: {}
     # type: RollingUpdate
 
+  # -- this allows you to specify pod labels that will appear on edge deployments
+  podLabels: {}
+
   image:
     repository: featurehub/edge
     tag: ""
@@ -474,6 +483,9 @@ dacha:
 
   strategy: {}
     # type: RollingUpdate
+
+  # -- this allows you to specify pod labels that will appear on dacha deployments
+  podLabels: {}
 
   # -- If `true`, entries from `environmentVars` will be mapped to /etc/app-config/application.properties file
   # To mount secret settings as /etc/app-config/application.properties see volume fields

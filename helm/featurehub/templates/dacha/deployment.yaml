@@ -45,6 +45,8 @@ spec:
         {{- end }}
       labels:
         {{- include "featurehub.dacha.selectorLabels" . | nindent 8 }}
+        {{- include "featurehub.podlabels" .Values.dacha.podLabels | nindent 8 }}
+        {{- include "featurehub.globalPodlabels" . | nindent 8 }}
     spec:
       {{- with .Values.dacha.imagePullSecrets }}
       imagePullSecrets:
