@@ -6,6 +6,19 @@ podSecurityPolicy: { }
 global:
 #  urlPath: "/foo/featurehub"
   intranet: true
+  podLabels:
+    fish: "cod"
 
-#managementRepository:
+managementRepository:
+  podLabels:
+    customer: "fried"
+
+edge:
+  podLabels:
+    customer: "fried"
+
+dacha:
+  podLabels:
+    customer: "fried"
+
 #  initContainers:

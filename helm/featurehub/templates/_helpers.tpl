@@ -133,6 +133,18 @@ Create the name of the service account to use (dacha)
 {{- end }}
 {{- end }}
 
+{{- define "featurehub.podlabels" -}}
+{{- range $key, $value := . -}}
+{{ $key | quote }}: {{ $value | quote }}
+{{- end -}}
+{{- end -}}
+
+{{- define "featurehub.globalPodlabels" -}}
+{{- range $key, $value := .Values.global.podLabels -}}
+{{ $key | quote }}: {{ $value | quote }}
+{{- end -}}
+{{- end -}}
+
 {{/*This allows us to have an override location*/}}
 {{- define "featurehub.liveness.url" -}}
 {{- if ne .Values.global.urlPath "" }}

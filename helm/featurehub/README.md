@@ -1,6 +1,6 @@
 # featurehub
 
-![Version: 4.1.2](https://img.shields.io/badge/Version-4.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.7.0](https://img.shields.io/badge/AppVersion-1.7.0-informational?style=flat-square)
+![Version: 4.1.3](https://img.shields.io/badge/Version-4.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.7.1](https://img.shields.io/badge/AppVersion-1.7.1-informational?style=flat-square)
 
 FeatueHub is an Enterprise Grade, Cloud Native Feature Management platform that is available to suite any organisations requirements. This fully supported Helm chart is the Open Source version of the product, which has all the same features as the [SaaS product](https://app.featurehub.io).
 
@@ -50,6 +50,7 @@ NATS and Postgres are *NOT* requirements of the project and are included only fo
 | dacha.podAnnotations | object | `{}` |  |
 | dacha.podDisruptionBudget.enabled | bool | `true` |  |
 | dacha.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| dacha.podLabels | object | `{}` | this allows you to specify pod labels that will appear on dacha deployments |
 | dacha.podSecurityContext.fsGroup | int | `999` |  |
 | dacha.prometheus | object | `{"enabled":false,"labels":{}}` | Prometheus configuration |
 | dacha.prometheus.enabled | bool | `false` | Whether to enable or disable prometheus metrics endpoints, and serviceMonitor If enabled, metrics are exposed on port 8701, on /metrics endpoint |
@@ -95,6 +96,7 @@ NATS and Postgres are *NOT* requirements of the project and are included only fo
 | edge.podAnnotations | object | `{}` |  |
 | edge.podDisruptionBudget.enabled | bool | `true` |  |
 | edge.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| edge.podLabels | object | `{}` | this allows you to specify pod labels that will appear on edge deployments |
 | edge.podSecurityContext.fsGroup | int | `999` |  |
 | edge.prometheus | object | `{"enabled":false,"labels":{}}` | Prometheus configuration |
 | edge.prometheus.enabled | bool | `false` | Whether to enable or disable prometheus metrics endpoints, and serviceMonitor If enabled, metrics are exposed on port 8701, on /metrics endpoint |
@@ -125,6 +127,7 @@ NATS and Postgres are *NOT* requirements of the project and are included only fo
 | global.ingress.enabled | bool | `true` |  |
 | global.ingress.ingressClassName | string | `""` | specify the ingress class name if thats what makes yor ingress work. E.g. in AWS its "alb" |
 | global.intranet | bool | `false` | if set to true, then MR will serve the intranet version of the application which does not require external HTML dependencies |
+| global.podLabels | object | `{}` | this allows you to specify pod labels that will appear on all deployments |
 | global.urlPath | string | `""` | the default url path is to mount as root, this lets you mount where ever you like, but it affects the health checks |
 | googlepubsub.backOffInSeconds | int | `20` | how long to backoff when failing to process a request from an incoming subscription |
 | googlepubsub.channels | object | `{"edgemr":{"description":"Updates from Edge are published through this channel and picked up by MR","subscription":"enricher-updates-sub","topicName":"featurehub-edge-updates"},"enrichedEvents":{"topicName":"enriched-feature-data"},"featureChangeMessage":{"description":"this is issued when a feature has changed, it is a complex diff message. It may or may not be enabled","topicName":"featurehub-messaging-channel"},"featureEnricher":{"description":"This channel is used for the initial enriched events. It is a queue.","subscription":"enricher-updates-sub","topicName":"enricher-updates-sub"},"featureWebhook":{"description":"dacha broadcasts to the topic, edge listens","subscription":"featurehub-enriched-events","topicName":"featurehub-enriched-events-webhooks"},"mrdacha":{"dachaPrefix":"featurehub-dacha2-listener","topicName":"featurehub-mr-dacha2"},"mredge":{"edgePrefix":"featurehub-edge-listener","topicName":"featurehub-mr-edge"},"stats":{"topicName":"featurehub-stats"}}` | feed these from something like Terraform, Pulumi or a Crossplane XRD. For more details see [PubSub config docs](https://docs.featurehub.io/featurehub/latest/configuration.html#_googles_pubsub) |
@@ -161,6 +164,7 @@ NATS and Postgres are *NOT* requirements of the project and are included only fo
 | managementRepository.podAnnotations | object | `{}` |  |
 | managementRepository.podDisruptionBudget.enabled | bool | `true` |  |
 | managementRepository.podDisruptionBudget.maxUnavailable | int | `1` |  |
+| managementRepository.podLabels | object | `{}` | this allows you to specify pod labels that will appear on MR deployments |
 | managementRepository.podSecurityContext.fsGroup | int | `999` |  |
 | managementRepository.prometheus | object | `{"enabled":false,"labels":{}}` | Prometheus configuration |
 | managementRepository.prometheus.enabled | bool | `false` | Whether to enable or disable prometheus metrics endpoints, and serviceMonitor If enabled, metrics are exposed on port 8701, on /metrics endpoint |
@@ -181,6 +185,3 @@ NATS and Postgres are *NOT* requirements of the project and are included only fo
 | nats | object | `{"cluster":{"enabled":true,"name":"featurehub","replicas":3},"enabled":true,"topologyKeys":[]}` | ----------------------------------------------------------------------------- # |
 | podAnnotations | object | `{}` |  |
 | postgresql | object | `{"enabled":true,"global":{"postgresql":{"auth":{"postgresPassword":"postgresql"}}},"primary":{"initdb":{"scripts":{"featurehub.sql":"CREATE USER featurehub PASSWORD 'featurehub' LOGIN;\nCREATE DATABASE featurehub;\nGRANT ALL PRIVILEGES ON DATABASE featurehub TO featurehub;\n\\connect featurehub\nGRANT ALL ON SCHEMA public TO featurehub;"}},"persistence":{"accessModes":["ReadWriteOnce"],"enabled":true,"size":"128Mi","storageClassName":"standard"}}}` | ----------------------------------------------------------------------------- # |
-
-----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.13.0](https://github.com/norwoodj/helm-docs/releases/v1.13.0)
