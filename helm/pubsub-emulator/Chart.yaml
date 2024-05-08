@@ -4,5 +4,5 @@ description: "This is a helm chart for the pubsub emulator, which is useful for 
   so please do not raise issues against it. We do accept PRs however to improve it if you wish."
 
 type: application
-version: 1.0.0
-appVersion: "398.0.0"
+version: 1.0.1
+appVersion: "472.0.0"
