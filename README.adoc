@@ -6,7 +6,7 @@ https://artifacthub.io/packages/search?repo=featurehub[image:https://img.shields
 
 == Deploying FeatureHub on Kubernetes
 
-Helm chart is designed to support FeatureHub's most scalable deployment option (REST + Streaming real-time feature updates). Read more about it https://docs.featurehub.io/featurehub/1.7.2/installation.html#_option_2a_scalable_deployment_streaming_rest_feature_updates[here]
+Helm chart is designed to support FeatureHub's most scalable deployment option (REST + Streaming real-time feature updates). Read more about it https://docs.featurehub.io/featurehub/latest/installation.html#_option_2a_scalable_deployment_streaming_rest_feature_updates[here]
 
 These instructions are designed to get you up and running on a local kubernetes running on KinD. They will be
 fleshed out over time as we have these examples running on Google's GKE/Autopilot, AWS's EKS/Fargate, and Azure's
@@ -139,6 +139,9 @@ If there is something wrong with the health check of a service, then the logs sh
 out exactly what is wrong, and so should the endpoint.
 
 == Changelog [[changelog]]
+
+=== 4.1.4
+- Release for version 1.8.0
 
 === 4.1.3
 - support for global and perdeployment podlabels
