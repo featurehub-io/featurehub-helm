@@ -212,6 +212,17 @@ managementRepository:
   # Entries of the secret specified here are the same as would be specified in /etc/app-config/secrets.properties
   envFromSecret: ""
 
+  # -- List of environment variables to be exposed to management-repository deployment.
+  # This allows you to set individual environment variables with valueFrom references to secrets or configmaps.
+  # Example:
+  # env:
+  #   - name: db.password
+  #     valueFrom:
+  #       secretKeyRef:
+  #         name: postgres-secret
+  #         key: password
+  env: []
+
   # -- Prometheus configuration
   prometheus:
     # -- Whether to enable or disable prometheus metrics endpoints, and serviceMonitor

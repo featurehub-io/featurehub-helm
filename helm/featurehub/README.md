@@ -153,6 +153,7 @@ NATS and Postgres are *NOT* requirements of the project and are included only fo
 | managementRepository.image.repository | string | `"featurehub/mr"` |  |
 | managementRepository.image.tag | string | `""` |  |
 | managementRepository.imagePullSecrets | list | `[]` |  |
+| managementRepository.env | list | `[]` | Additional environment variables for management repository |
 | managementRepository.ingress.annotations | object | `{}` |  |
 | managementRepository.ingress.className | string | `""` |  |
 | managementRepository.ingress.enabled | bool | `false` |  |
