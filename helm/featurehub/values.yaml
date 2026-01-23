@@ -685,16 +685,14 @@ googlepubsub:
       topicName: "enriched-feature-data"
 
 # ------------------------------------------------------------------------------- #
-# NATS Helm Chart from Bitnami
+# Official NATS Helm Chart
 # Documentation: https://github.com/nats-io/k8s/tree/main/helm/charts/nats
 # ------------------------------------------------------------------------------- #
 nats:
   enabled: true
-  cluster:
-    enabled: true
-    name: featurehub
-    replicas: 3
-  topologyKeys: []
+  config:
+    cluster:
+      enabled: true
 
 # ------------------------------------------------------------------------------- #
 # PostgreSQL Helm Chart from Bitnami:
