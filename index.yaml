@@ -2,6 +2,39 @@ apiVersion: v1
 entries:
   featurehub:
   - apiVersion: v2
+    appVersion: 1.10.1
+    created: "2026-11-07T02:53:44.902952449Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://repo.helmforge.dev
+      version: 2.1.2
+    - condition: nats.enabled
+      name: nats
+      repository: https://nats-io.github.io/k8s/helm/charts/
+      version: 2.15.2
+    description: 'FeatueHub is an Enterprise Grade, Cloud Native Feature Management
+      platform that is available to suite any organisations requirements. This fully
+      supported Helm chart is the Open Source version of the product, which has all
+      the same features as the [SaaS product](https://app.featurehub.io).  The project
+      is hosted on [Github](https://github.com/featurehub-io/featurehub). It supports
+      Postgres, MySQL, MariaDB or Oracle Database deployments, and uses NATS or Google
+      PubSub as a streaming layer. Kinesis is available but has limited testing. Documentation
+      on configuration is provided on [Featurehub Docs](https://docs.featurehub.io/featurehub/latest/configuration.html)  NATS
+      and Postgres are *NOT* requirements of the project and are included only for
+      convenience and evaluation. It is expected people will install their own requirements. '
+    digest: 8f75aaf218a241966bb741dd73c033ea36f285e27fafaf22d9ae26cb81de7310
+    icon: https://raw.githubusercontent.com/featurehub-io/featurehub/main/docs/modules/ROOT/images/fh_icon.png
+    maintainers:
+    - email: info@featurehub.io
+      name: FeatureHub
+      url: https://github.com/featurehub-io/featurehub-helm
+    name: featurehub
+    type: application
+    urls:
+    - https://github.com/featurehub-io/featurehub-helm/releases/download/featurehub-4.2.0/featurehub-4.2.0.tgz
+    version: 4.2.0
+  - apiVersion: v2
     appVersion: 1.9.1
     created: "2025-07-22T09:03:21.561936706Z"
     dependencies:
@@ -479,4 +512,4 @@ entries:
     urls:
     - https://github.com/featurehub-io/featurehub-helm/releases/download/pubsub-emulator-1.0.0/pubsub-emulator-1.0.0.tgz
     version: 1.0.0
-generated: "2025-07-22T09:03:21.562032545Z"
+generated: "2026-11-07T02:53:44.903067501Z"
