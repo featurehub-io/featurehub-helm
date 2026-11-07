@@ -1,2 +1,2 @@
 #!/bin/bash
-docker run -it  --workdir=/data  --volume $PWD:/data quay.io/helmpack/chart-testing:v3.7.1 /bin/bash
+docker run --workdir=/data  --volume $PWD:/data quay.io/helmpack/chart-testing:latest sh -c ./ct-test.sh

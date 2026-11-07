@@ -1,6 +1,6 @@
 # featurehub
 
-![Version: 4.1.6](https://img.shields.io/badge/Version-4.1.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.9.1](https://img.shields.io/badge/AppVersion-1.9.1-informational?style=flat-square)
+![Version: 4.2.0](https://img.shields.io/badge/Version-4.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.10.1](https://img.shields.io/badge/AppVersion-1.10.1-informational?style=flat-square)
 
 FeatueHub is an Enterprise Grade, Cloud Native Feature Management platform that is available to suite any organisations requirements. This fully supported Helm chart is the Open Source version of the product, which has all the same features as the [SaaS product](https://app.featurehub.io).
 
@@ -18,8 +18,8 @@ NATS and Postgres are *NOT* requirements of the project and are included only fo
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://nats-io.github.io/k8s/helm/charts/ | nats | 1.1.5 |
-| https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami | postgresql | 12.1.13 |
+| https://nats-io.github.io/k8s/helm/charts/ | nats | 2.15.2 |
+| https://repo.helmforge.dev | postgresql | 2.1.2 |
 
 ## Values
 
@@ -182,6 +182,6 @@ NATS and Postgres are *NOT* requirements of the project and are included only fo
 | managementRepository.strategy | object | `{}` |  |
 | managementRepository.tolerations | list | `[]` |  |
 | nameOverride | string | `""` |  |
-| nats | object | `{"cluster":{"enabled":true,"name":"featurehub","replicas":3},"enabled":true,"topologyKeys":[]}` | ----------------------------------------------------------------------------- # |
+| nats | object | `{"config":{"cluster":{"enabled":true,"name":"featurehub","replicas":3}},"enabled":true}` | ----------------------------------------------------------------------------- # |
 | podAnnotations | object | `{}` |  |
-| postgresql | object | `{"enabled":true,"global":{"postgresql":{"auth":{"postgresPassword":"postgresql"}}},"primary":{"initdb":{"scripts":{"featurehub.sql":"CREATE USER featurehub PASSWORD 'featurehub' LOGIN;\nCREATE DATABASE featurehub;\nGRANT ALL PRIVILEGES ON DATABASE featurehub TO featurehub;\n\\connect featurehub\nGRANT ALL ON SCHEMA public TO featurehub;"}},"persistence":{"accessModes":["ReadWriteOnce"],"enabled":true,"size":"128Mi","storageClassName":"standard"}}}` | ----------------------------------------------------------------------------- # |
+| postgresql | object | `{"auth":{"database":"featurehub","password":"featurehub","postgresPassword":"postgresql","username":"featurehub"},"enabled":true,"standalone":{"persistence":{"accessModes":["ReadWriteOnce"],"enabled":true,"size":"128Mi","storageClass":"standard"}}}` | ----------------------------------------------------------------------------- # |

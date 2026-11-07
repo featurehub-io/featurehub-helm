@@ -8,12 +8,11 @@ https://artifacthub.io/packages/search?repo=featurehub[image:https://img.shields
 
 Helm chart is designed to support FeatureHub's most scalable deployment option (REST + Streaming real-time feature updates). Read more about it https://docs.featurehub.io/featurehub/latest/installation.html#_option_2a_scalable_deployment_streaming_rest_feature_updates[here]
 
-These instructions are designed to get you up and running on a local kubernetes running on KinD. They will be
-fleshed out over time as we have these examples running on Google's GKE/Autopilot, AWS's EKS/Fargate, and Azure's
-AKS.
+These instructions are designed to get you up and running on a local kubernetes running on KinD. Users have reported this
+helm chart working with minor modifications on AWS, Google and Azure.
 
-NOTE: This set of Helm charts is designed to be run the local kinD cluster and be fully operable by anyone following
-these instructions. Please note, you will likely need to modify certain values in the chart to suit your production needs.
+NOTE: This set of Helm charts is designed to be run  the local kinD cluster and be fully operable by anyone following
+these instructions. Please note, you will likely need to modify certain values in the chart to suit your production needs, such as adding an `ingressClassName`.
 
 
 == Local Development/Testing
@@ -21,7 +20,7 @@ these instructions. Please note, you will likely need to modify certain values i
 The helm chart on the kind cluster installs with a default of Postgres and NATs. There
 are deploy scripts for using both, but a simple
 
- $ helm upgrade -i featurehub featurehub -n featurehub
+ $ helm upgrade -i featurehub featurehub -n featurehub --create-namespace
 
 will work as long as the other kinD dependencies are installed. Below are the setup
 instructions for ensuring that kinD is installed and configured correctly (it needs
@@ -34,39 +33,35 @@ be able to use them too and you can skip this step.
 
 If you don't have KinD installed, follow these instructions https://kind.sigs.k8s.io/docs/user/quick-start/#installation[KinD]
 
+It is recommended that because kind runs in a docker container, you also install https://github.com/kubernetes-sigs/cloud-provider-kind[cloud-provider-kind] - this will create a full load balancer capability for the FeatureHub ingress on your own machine.
+
 === 2. Create the KinD cluster
+
+All the commands from here on are run from the `helm` directory of this repository:
 
 [source,bash]
 ----
+cd helm
 kind create cluster --config=kind-cluster.yaml
 ----
 
-=== 3. Install Ingress - allow traffic into the cluster
+Once you have done that, you will need to start the `cloud-provider-kind` to let it surface the ingress:
 
 [source,bash]
 ----
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
-
-kubectl wait --namespace ingress-nginx \
-  --for=condition=ready pod \
-  --selector=app.kubernetes.io/component=controller \
-  --timeout=90s
+sudo cloud-provider-kind
 ----
 
-=== 4. Install Chart dependencies
+=== 3. Install Chart dependencies
 
  $ cd featurehub && helm dependency update && cd ..
 
-=== 5. Install FeatureHub (with defaults)
+=== 4. Install FeatureHub (with defaults)
 
 [source,bash]
 ----
-helm upgrade --install featurehub featurehub
+helm upgrade --install featurehub featurehub -n featurehub --create-namespace
 ----
-
-(If you receive an error 'Error: Internal error occurred: failed calling webhook ...', try deleting the ingress-nginx-admission
-resource `kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission` and try again)
-
 
 The FeatureHub services will initially 'crash' because they expect the Postgres and NATs services to already be available. Its
 ok, they will recover fairly quickly and start up.
@@ -75,12 +70,12 @@ To update it with config changes, just
 
 [source,bash]
 ----
-helm upgrade featurehub featurehub
+helm upgrade featurehub featurehub -n featurehub
 ----
 
 It should show something like this:
 
- $  kubectl get pods
+ $ kubectl get pods -n featurehub
 
 ----
 NAME                                                READY   STATUS              RESTARTS   AGE
@@ -96,7 +91,7 @@ featurehub-nats-box-78587c4478-nkbzt                0/1     ContainerCreating   
 featurehub-postgresql-0                             0/1     Running             0          8s
 ----
 
-=== 6. Test
+=== 5. Test
 
 It should be running on port 80, so you can login, create a new system, add features, etc. The Edge service is
 also running on port 80.
@@ -120,13 +115,13 @@ port configuration is wrong.
 You will need to find a pod (unless you have enabled Prometheus on the MR, in which case you
 get a service endpoint for it). For example:
 
- $ kubectl get pods
+ $ kubectl get pods -n featurehub
 
 and then port-forward
 
 The management port is exposed on a service:
 
- $ kubectl port-forward featurehub-management-repository-bf8b79d4d-2pkdl 8701
+ $ kubectl port-forward -n featurehub svc/featurehub-management-repository 8701
 
 A curl to check it's health:
 
@@ -139,6 +134,12 @@ If there is something wrong with the health check of a service, then the logs sh
 out exactly what is wrong, and so should the endpoint.
 
 == Changelog [[changelog]]
+
+=== 4.2.0
+
+- replacement for bitnami postgres, upgrade to postgres v18
+- upgrade to latest NATs server
+- upgrade to Featurehub 1.10.1
 
 === 4.1.4
 - Release for version 1.8.0

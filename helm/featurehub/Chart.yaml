@@ -12,19 +12,19 @@ description: "FeatueHub is an Enterprise Grade, Cloud Native Feature Management 
   their own requirements.
   "
 type: application
-version: 4.1.6
+version: 4.2.0
 icon: https://raw.githubusercontent.com/featurehub-io/featurehub/main/docs/modules/ROOT/images/fh_icon.png
-appVersion: "1.9.1"
+appVersion: "1.10.1"
 maintainers:
   - name: FeatureHub
     email: info@featurehub.io
     url: https://github.com/featurehub-io/featurehub-helm
 dependencies:
   - name: postgresql
-    version: 12.1.13
-    repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
+    version: 2.1.2
+    repository: https://repo.helmforge.dev
     condition: postgresql.enabled
   - name: nats
-    version: 1.1.5
+    version: 2.15.2
     repository: https://nats-io.github.io/k8s/helm/charts/
     condition: nats.enabled

@@ -685,44 +685,37 @@ googlepubsub:
       topicName: "enriched-feature-data"
 
 # ------------------------------------------------------------------------------- #
-# NATS Helm Chart from Bitnami
+# NATS Helm Chart from nats.io
 # Documentation: https://github.com/nats-io/k8s/tree/main/helm/charts/nats
 # ------------------------------------------------------------------------------- #
 nats:
   enabled: true
-  cluster:
-    enabled: true
-    name: featurehub
-    replicas: 3
-  topologyKeys: []
+  config:
+    cluster:
+      enabled: true
+      name: featurehub
+      replicas: 3
 
 # ------------------------------------------------------------------------------- #
-# PostgreSQL Helm Chart from Bitnami:
-# Documentation: https://github.com/bitnami/charts/tree/master/bitnami/postgresql
+# PostgreSQL 18 Helm Chart from HelmForge:
+# Documentation: https://helmforge.dev/docs/charts/postgresql
 # ------------------------------------------------------------------------------- #
 postgresql:
   # Enabled by default just to make it easy to start working with the Chart. This is not
   # a hard requirement, as you may want to deploy the postgresql in a different way, as
   # a separate Helm Chart, use an existing one, deploy it to RDS, etc.
   enabled: true
-  global:
-    postgresql:
-      auth:
-        postgresPassword: postgresql
-  primary:
+  # The chart's first-boot script creates this database owned by this user and grants
+  # it the public schema. Strongly recommended ensuring these match the values in .Values.db
+  auth:
+    postgresPassword: postgresql
+    database: featurehub
+    username: featurehub
+    password: featurehub
+  standalone:
     persistence:
       enabled: true
-      storageClassName: standard
+      storageClass: standard
       accessModes:
         - ReadWriteOnce
       size: 128Mi
-    initdb:
-      scripts:
-        # strongly recommended ensuring that the values in this init script
-        # match the ones set in .Values.db
-        featurehub.sql: |-
-          CREATE USER featurehub PASSWORD 'featurehub' LOGIN;
-          CREATE DATABASE featurehub;
-          GRANT ALL PRIVILEGES ON DATABASE featurehub TO featurehub;
-          \connect featurehub
-          GRANT ALL ON SCHEMA public TO featurehub;
