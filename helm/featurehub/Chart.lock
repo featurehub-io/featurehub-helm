@@ -1,9 +1,9 @@
 dependencies:
 - name: postgresql
-  repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
-  version: 12.1.13
+  repository: https://repo.helmforge.dev
+  version: 2.1.2
 - name: nats
   repository: https://nats-io.github.io/k8s/helm/charts/
-  version: 1.1.5
-digest: sha256:d7b5fc428158252438bc3131fc272bee5cd68e9ecf370a6da6ddd82e31d8a17a
-generated: "2023-12-08T18:11:13.778337+13:00"
+  version: 2.15.2
+digest: sha256:1578d27e16f531828ac4c4a6a8cf79a309ec4b046d3a4e6ad3d2bf85a0d4c798
+generated: "2026-11-07T08:22:07.376373+13:00"

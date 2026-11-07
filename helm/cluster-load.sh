@@ -8,4 +8,5 @@ CLUSTER_NAME=$(kind get clusters)
 VERSION=$1
 kind --name $CLUSTER_NAME load docker-image featurehub/mr:$VERSION
 kind --name $CLUSTER_NAME load docker-image featurehub/edge:$VERSION
-kind --name $CLUSTER_NAME load docker-image featurehub/dacha:$VERSION
+#kind --name $CLUSTER_NAME load docker-image featurehub/dacha:$VERSION
+kind --name $CLUSTER_NAME load docker-image featurehub/dacha2:$VERSION

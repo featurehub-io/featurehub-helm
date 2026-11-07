@@ -1,6 +1,6 @@
 # pubsub-emulator
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 398.0.0](https://img.shields.io/badge/AppVersion-398.0.0-informational?style=flat-square)
+![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 427.0.0](https://img.shields.io/badge/AppVersion-427.0.0-informational?style=flat-square)
 
 This is a helm chart for the pubsub emulator, which is useful for testing charts against. It is unsupported, so please do not raise issues against it. We do accept PRs however to improve it if you wish.
 
