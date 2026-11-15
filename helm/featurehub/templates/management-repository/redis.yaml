@@ -1,0 +1,33 @@
+{{- /*
+MR's Redis settings (the Redis fallback for Dacha2). MR holds no cache, so these only exist while Redis is enabled on MR
+and changing them rolls MR (see the checksum/redis annotation on the deployment).
+*/ -}}
+{{- if and .Values.managementRepository.enabled (include "featurehub.redis.mrEnabled" .) }}
+{{- if and .Values.redis.password (not .Values.redis.existingSecret) }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "featurehub.redis.mrName" . }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  labels:
+    {{- include "featurehub.managementRepository.labels" . | nindent 4 }}
+type: Opaque
+stringData:
+  password: {{ .Values.redis.password | quote }}
+{{- end }}
+{{- if .Values.redis.caCert }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "featurehub.redis.mrName" . }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  labels:
+    {{- include "featurehub.managementRepository.labels" . | nindent 4 }}
+data:
+  ca.pem: |
+    {{- .Values.redis.caCert | nindent 4 }}
+{{- end }}
+{{- end }}

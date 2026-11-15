@@ -28,7 +28,11 @@ spec:
             pathType: Prefix
             backend:
               service:
+                {{- if include "featurehub.maintenance.routesTraffic" . }}
+                name: {{ include "featurehub.maintenanceResponder.name" . | quote }}
+                {{- else }}
                 name: "featurehub-management-repository"
+                {{- end }}
                 port:
                   name: http
   {{- end }}

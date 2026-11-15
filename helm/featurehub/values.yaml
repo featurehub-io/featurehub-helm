@@ -641,6 +641,146 @@ dacha:
     # - name: foobar
     #  emptyDir: {}
 
+# ------------------------------------------------------------------------------- #
+# Maintenance windows - see https://docs.featurehub.io/featurehub/latest/maintenance.html
+# and "Maintenance windows" in the README. Requires FeatureHub 1.11 or later.
+# ------------------------------------------------------------------------------- #
+maintenance:
+  # -- The stage of the maintenance window. Use them in this order: disabled -> warm -> active -> shutdown -> post -> disabled.
+  # `disabled`: normal operation, the maintenance responder is not deployed.
+  # `warm`: the maintenance responder is deployed but receives no traffic.
+  # `active`: all non-Edge ingress traffic goes to the maintenance responder and Edge blocks feature updates. MR is still running: call its maintenance publish-all now.
+  # `shutdown`: as active, and MR is scaled to 0 for the database work.
+  # `post`: MR is scaled back up, the maintenance responder still takes the traffic so you can check MR.
+  mode: disabled
+  # -- The start of the window, an ISO-8601 UTC timestamp ending in Z, e.g. 2026-11-17T10:15:30Z. Setting start, end and
+  # message while the mode is `disabled` announces the window to Admin app users ahead of time (and restarts MR).
+  # All three are required in any other mode.
+  start: ""
+  # -- The end of the window, in the same format. Also used for the Retry-After header.
+  end: ""
+  # -- The message shown to Admin app users.
+  message: ""
+
+  edgeUpdateBlock:
+    # -- Mount the update block file into Edge, so it refuses feature updates (SDK/test API PUTs) with a 503 while the
+    # maintenance responder takes the traffic. The file is changed without restarting Edge. Turning this on or off restarts Edge.
+    enabled: true
+    # -- How often Edge checks for the update block file
+    checkIntervalSeconds: 30
+
+  # -- The maintenance responder stands in for MR: it serves the Admin app and answers the API with a 503 and Retry-After.
+  # It is deployed in every mode except `disabled`, and never connects to the database or the messaging layer.
+  responder:
+    replicaCount: 1
+
+    strategy: {}
+
+    image:
+      repository: featurehub/maintenance-responder
+      tag: ""
+
+    pullPolicy: IfNotPresent
+
+    # -- Comma-separated path prefixes that get a 503. Empty uses the image default (mr-api,saml,oauth,dacha2,info).
+    interceptPrefixes: ""
+
+    # -- Extra environment variables for the maintenance responder, e.g. CORS settings
+    environmentVars: {}
+
+    # -- Name of an existing secret whose keys are exposed as environment variables
+    envFromSecret: ""
+
+    resources: {}
+
+    livenessProbe:
+      initialDelaySeconds: 10
+      periodSeconds: 20
+      failureThreshold: 2
+      timeoutSeconds: 3
+      httpGet:
+        path: "/health/liveness"
+        port: metrics
+
+    readinessProbe:
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      successThreshold: 1
+      failureThreshold: 2
+      timeoutSeconds: 3
+      httpGet:
+        path: "/health/readiness"
+        port: metrics
+
+    serviceAccount:
+      create: true
+      annotations: {}
+      labels: {}
+      name: ""
+
+    prometheus:
+      enabled: false
+      labels: {}
+
+    podLabels: {}
+    podAnnotations: {}
+    imagePullSecrets: []
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+
+    podDisruptionBudget:
+      enabled: false
+      maxUnavailable: 1
+
+    podSecurityContext:
+      fsGroup: 999
+
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 999
+
+    extraVolumeMounts: []
+    extraVolumes: []
+
+# ------------------------------------------------------------------------------- #
+# Redis fallback for Dacha2 - see https://docs.featurehub.io/featurehub/latest/maintenance.html#_redis_fallback
+# MR writes every environment and service account to Redis, and Dacha2 reads them while MR is unavailable.
+# This chart does not deploy Redis. Requires FeatureHub 1.11 or later.
+# ------------------------------------------------------------------------------- #
+redis:
+  # -- Enables the Redis fallback, e.g. `redis://redis:6379` or `rediss://10.0.0.3:6378` (TLS). Do not put the
+  # password in the url, use `password` or `existingSecret`.
+  url: ""
+  # -- standalone, sentinel or cluster. For sentinel and cluster, list several host:port pairs separated by commas in the url.
+  mode: standalone
+  # -- The master name, required for sentinel mode
+  sentinelMaster: ""
+  username: ""
+  # -- Empty uses the default prefix (`featurehub`). Use a different prefix for each FeatureHub install sharing one Redis.
+  keyPrefix: ""
+  # -- The Redis password. The chart puts it in a Secret. Use this or `existingSecret`.
+  password: ""
+  # -- The name of a Secret you created, instead of `password`. It needs the key `existingSecretPasswordKey` (for MR)
+  # AND a `redis.properties` key for Dacha2 containing `dacha2.redis.password=<the password>`, because Dacha2 re-reads
+  # its Redis settings from files at runtime. The Secret is always mounted into Dacha2, so create it before setting this
+  # (setting or changing this restarts Dacha2 once).
+  existingSecret: ""
+  existingSecretPasswordKey: password
+  # -- The PEM CA certificate(s) to trust for rediss://, if the server is not signed by a public CA
+  caCert: ""
+
+  managementRepository:
+    # -- Turn Redis on for MR when url is set. Changing any redis setting restarts MR, which is cheap as MR holds no cache.
+    enabled: true
+
+  dacha:
+    # -- Turn the Redis fallback on for Dacha2 when url is set. Dacha2 picks this up without restarting. Enable MR first,
+    # wait for its full sync (`mr_redis_last_full_sync_seconds`), then enable Dacha2.
+    enabled: true
+    # -- How often Dacha2 re-reads its Redis settings
+    configReloadSeconds: 30
+
 googlepubsub:
   # -- whether to enable chart for using Google PubSub
   enabled: false

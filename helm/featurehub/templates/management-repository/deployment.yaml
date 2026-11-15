@@ -8,7 +8,8 @@ metadata:
   labels:
     {{- include "featurehub.managementRepository.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.managementRepository.replicaCount }}
+  {{- /* MR is the only service using the database, so it stops in the maintenance shutdown stage */}}
+  replicas: {{ if include "featurehub.maintenance.stopsDatabaseServices" . }}0{{ else }}{{ .Values.managementRepository.replicaCount }}{{ end }}
   {{- with .Values.managementRepository.strategy }}
   strategy:
     {{- . | toYaml | nindent 4 }}
@@ -35,6 +36,11 @@ spec:
 
         {{- if gt ( len .Values.global.extraCommonConfigFiles ) 0 }}
         checksum/global-common-config-extra: {{ include (print $.Template.BasePath "/common/configmap-global-common-config-extra.yaml") . | sha256sum }}
+        {{- end }}
+
+        {{- if include "featurehub.redis.mrEnabled" . }}
+        {{- /* the password comes from a secretKeyRef, so roll MR when the Redis settings change */}}
+        checksum/redis: {{ toJson .Values.redis | sha256sum }}
         {{- end }}
 
         {{- range $key, $value := .Values.managementRepository.podAnnotations }}
@@ -88,6 +94,11 @@ spec:
                 name: {{ .Values.managementRepository.envFromSecret }}
             {{- end }}
           {{- end }}
+          {{- $mrEnv := printf "%s\n%s" (include "featurehub.maintenance.envs" .) (include "featurehub.redis.mrEnvs" .) | trim }}
+          {{- if $mrEnv }}
+          env:
+            {{- $mrEnv | nindent 12 }}
+          {{- end }}
           ports:
             - name: http
               containerPort: 8085
@@ -122,6 +133,11 @@ spec:
           {{- else }}
             - mountPath: /etc/app-config
               name: app-config-empty
+          {{- end }}
+          {{- if and (include "featurehub.redis.mrEnabled" .) .Values.redis.caCert }}
+            - mountPath: /etc/redis-ca
+              name: redis-ca
+              readOnly: true
           {{- end }}
           {{- if .Values.managementRepository.extraVolumeMounts }}
             {{- toYaml .Values.managementRepository.extraVolumeMounts | nindent 12 }}
@@ -162,6 +178,11 @@ spec:
       {{- else }}
         - name: app-config-empty
           emptyDir: {}
+      {{- end }}
+      {{- if and (include "featurehub.redis.mrEnabled" .) .Values.redis.caCert }}
+        - name: redis-ca
+          configMap:
+            name: {{ include "featurehub.redis.mrName" . }}
       {{- end }}
       {{- if .Values.managementRepository.extraVolumes }}
         {{- toYaml .Values.managementRepository.extraVolumes | nindent 8 }}

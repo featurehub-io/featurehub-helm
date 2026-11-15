@@ -24,6 +24,8 @@ jobs:
       - name: Run basic lint
         run: helm lint
         working-directory: helm/featurehub
+      - name: Test maintenance and redis rendering
+        run: bash helm/test-maintenance.sh
       - name: Run lint
         run: |
           helm repo add helmforge https://repo.helmforge.dev

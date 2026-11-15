@@ -1,0 +1,69 @@
+{{- /*
+Dacha2's Redis fallback settings. Restarting Dacha2 empties its cache, so these are files in a ConfigMap and a Secret
+that are ALWAYS rendered and mounted (with no settings when Redis is disabled). Dacha2 re-reads them at runtime
+(dacha2.redis.config-file), so enabling, changing or disabling Redis updates running pods without a restart.
+
+For that to hold, nothing in the Dacha2 pod template may change when Redis is enabled:
+- the ConfigMap and Secret have FIXED names, and are never included in a checksum annotation
+- they are mounted as whole directories, never with subPath (subPath mounts are never updated)
+- the dacha2.redis.config-file env vars are always set
+
+The CA certificate file is named after a hash of its contents, so when the CA rotates the configured path changes and
+running Dacha2 pods reconnect with the new CA. The CA is not secret, so it lives in the ConfigMap.
+
+With redis.existingSecret, that Secret is mounted instead of the one below, and must contain a `redis.properties` key
+(e.g. `dacha2.redis.password=...`) as well as the password key MR uses.
+*/ -}}
+{{- if .Values.dacha.enabled }}
+{{- $enabled := include "featurehub.redis.dachaEnabled" . }}
+{{- $r := .Values.redis }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "featurehub.redis.dachaName" . }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  labels:
+    {{- include "featurehub.dacha.labels" . | nindent 4 }}
+data:
+  redis.properties: |
+    # managed by helm - dacha2 re-reads this file at runtime
+    {{- if $enabled }}
+    dacha2.redis.url={{ include "featurehub.redis.propertyValue" $r.url }}
+    dacha2.redis.mode={{ include "featurehub.redis.propertyValue" $r.mode }}
+    {{- if $r.keyPrefix }}
+    dacha2.redis.key-prefix={{ include "featurehub.redis.propertyValue" $r.keyPrefix }}
+    {{- end }}
+    {{- if $r.sentinelMaster }}
+    dacha2.redis.sentinel.master={{ include "featurehub.redis.propertyValue" $r.sentinelMaster }}
+    {{- end }}
+    {{- if $r.username }}
+    dacha2.redis.username={{ include "featurehub.redis.propertyValue" $r.username }}
+    {{- end }}
+    {{- if $r.caCert }}
+    dacha2.redis.tls.ca-cert=/etc/redis-config/{{ include "featurehub.redis.caFileName" . }}
+    {{- end }}
+    {{- end }}
+  {{- if and $enabled $r.caCert }}
+  {{ include "featurehub.redis.caFileName" . }}: |
+    {{- $r.caCert | nindent 4 }}
+  {{- end }}
+{{- if not $r.existingSecret }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "featurehub.redis.dachaName" . }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  labels:
+    {{- include "featurehub.dacha.labels" . | nindent 4 }}
+type: Opaque
+stringData:
+  redis.properties: |
+    # managed by helm - dacha2 re-reads this file at runtime
+    {{- if and $enabled $r.password }}
+    dacha2.redis.password={{ include "featurehub.redis.propertyValue" $r.password }}
+    {{- end }}
+{{- end }}
+{{- end }}

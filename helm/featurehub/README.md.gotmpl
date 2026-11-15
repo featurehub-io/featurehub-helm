@@ -13,4 +13,84 @@
 
 {{ template "chart.requirementsSection" . }}
 
+## Maintenance windows
+
+FeatureHub 1.11 and later can keep the Admin app in maintenance mode, and keep SDKs working, while the Management
+Repository (MR) is shut down, e.g. for a database upgrade. The
+[Maintenance Windows](https://docs.featurehub.io/featurehub/latest/maintenance.html) docs explain the pieces. This chart
+drives them all from `maintenance.mode`:
+
+| `maintenance.mode` | Maintenance responder | Admin (non-`/features`) ingress traffic | MR replicas | Edge feature updates |
+|---|---|---|---|---|
+| `disabled` | not deployed | MR | normal | allowed |
+| `warm` | deployed | MR | normal | allowed |
+| `active` | deployed | maintenance responder | normal | blocked (503) |
+| `shutdown` | deployed | maintenance responder | **0** | blocked (503) |
+| `post` | deployed | maintenance responder | normal | blocked (503) |
+
+`maintenance.start`, `maintenance.end` (ISO-8601 UTC timestamps ending in `Z`) and `maintenance.message` are required
+in every mode except `disabled`. Setting them while `disabled` announces the window to Admin users ahead of time.
+
+A typical window, one `helm upgrade` per step:
+
+1. A few days ahead: set `start`, `end` and `message` (MR restarts, Admin users see the upcoming notice). If you use
+   the Redis fallback (below), turn it on now.
+2. `mode: warm` and wait for the maintenance responder to be ready.
+3. `mode: active` when the window starts. Wait until every Edge logs `feature updates are now BLOCKED` (the kubelet can
+   take a minute or two to update the file), then call the publish-all on **one** MR and wait for
+   `redis: maintenance-publish-all: finished` in its log:
+   ```sh
+   kubectl port-forward <an mr pod> 8701:8701
+   curl -X POST http://localhost:8701/maintenance/publish-all
+   ```
+4. `mode: shutdown`: MR is scaled to 0. Do the database work.
+5. `mode: post`: MR starts again with the maintenance responder still taking the traffic, so you can check MR.
+6. `mode: disabled`, and clear `start`, `end` and `message` (or leave them until the end time has passed).
+
+The chart switches its own ingresses (`global.ingress` and `managementRepository.ingress`). If your ingress or load
+balancer is managed outside the chart, point its Admin routes at the `<release>-maintenance-responder` Service (port
+`8085`, the same as MR) during `active`, `shutdown` and `post`, and keep `/features` on Edge. Dacha2 keeps calling MR
+directly throughout, which is what lets it notice MR has gone and fall back to Redis.
+
+Changing the mode never restarts Edge or Dacha2. The Edge update block is a file in the fixed-name ConfigMap
+`<release>-edge-update-block`, which Edge re-checks every `maintenance.edgeUpdateBlock.checkIntervalSeconds`.
+
+### Redis fallback for Dacha2
+
+With `redis.url` set, MR writes every environment and service account to Redis, and Dacha2 reads them on a cache miss
+while MR is unavailable, so SDKs with API keys Dacha2 has not seen yet, and restarted Dacha2 pods, keep working. See
+[Serving Dacha2 cache misses from Redis](https://docs.featurehub.io/featurehub/latest/maintenance.html#_redis_fallback),
+including the Redis requirements (`maxmemory-policy noeviction`, authentication and TLS).
+
+This chart does not deploy Redis. Use your cloud's managed Redis, or another chart. Redis is only needed around a
+maintenance window, so you can create it before the window and remove it afterwards.
+
+Turn it on in two steps:
+
+1. Set `redis.url` (and `redis.password` or `redis.existingSecret`, and `redis.caCert` for a private CA) with
+   `redis.dacha.enabled: false`. MR restarts (cheap, it holds no cache) and runs a full sync. Wait for
+   `mr_redis_last_full_sync_seconds`.
+2. Set `redis.dacha.enabled: true`. Dacha2 picks this up within `redis.dacha.configReloadSeconds`, **without
+   restarting**.
+
+Turn it off in the reverse order: `redis.dacha.enabled: false` first, then remove `redis.url`, then remove Redis.
+
+Dacha2 re-reads its Redis settings from the `<release>-dacha-redis` ConfigMap and Secret, which are always mounted
+(empty while Redis is off). That is why the Dacha2 pod template does not change when Redis is turned on or off. Do not
+add anything to `dacha.podAnnotations` (or the global `podAnnotations`) that changes with the Redis settings, such as a
+checksum of those values, or Dacha2 will restart and empty its cache anyway. The same applies to Edge and the update
+block ConfigMap.
+
+If you use `redis.existingSecret`, the Secret must contain two keys: the password under `redis.existingSecretPasswordKey`
+(default `password`) for MR, and `redis.properties` for Dacha2:
+
+```sh
+kubectl create secret generic featurehub-redis \
+  --from-literal=password='<password>' \
+  --from-literal=redis.properties='dacha2.redis.password=<password>'
+```
+
+Create the Secret before setting `redis.existingSecret`. Setting or changing `redis.existingSecret` restarts Dacha2 once,
+because the mounted Secret's name is part of its pod template.
+
 {{ template "chart.valuesSection" . }}
