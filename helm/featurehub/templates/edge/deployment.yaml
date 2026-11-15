@@ -80,6 +80,14 @@ spec:
                 name: {{ .Values.edge.envFromSecret }}
             {{- end }}
           {{- end }}
+          {{- if .Values.maintenance.edgeUpdateBlock.enabled }}
+          env:
+            # feature updates are refused while this file exists - see edge/configmap-update-block.yaml
+            - name: edge.update-block.file
+              value: /etc/edge-update-block/blocked
+            - name: edge.update-block.check-interval-seconds
+              value: {{ .Values.maintenance.edgeUpdateBlock.checkIntervalSeconds | quote }}
+          {{- end }}
           ports:
             - name: http
               containerPort: 8553
@@ -114,6 +122,11 @@ spec:
           {{- else }}
             - mountPath: /etc/app-config
               name: app-config-empty
+          {{- end }}
+          {{- if .Values.maintenance.edgeUpdateBlock.enabled }}
+            - mountPath: /etc/edge-update-block
+              name: update-block
+              readOnly: true
           {{- end }}
           {{- if .Values.edge.extraVolumeMounts }}
             {{- toYaml .Values.edge.extraVolumeMounts | nindent 12 }}
@@ -154,6 +167,13 @@ spec:
       {{- else }}
         - name: app-config-empty
           emptyDir: {}
+      {{- end }}
+      {{- if .Values.maintenance.edgeUpdateBlock.enabled }}
+        # fixed name and no checksum annotation, so a mode change never restarts Edge
+        - name: update-block
+          configMap:
+            name: {{ include "featurehub.edge.name" . }}-update-block
+            optional: true
       {{- end }}
       {{- if .Values.edge.extraVolumes }}
         {{- toYaml .Values.edge.extraVolumes | nindent 8 }}

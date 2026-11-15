@@ -1,0 +1,22 @@
+{{- /*
+While the maintenance responder takes the ingress traffic, MR must not receive feature changes, so the `blocked` file
+exists and Edge answers feature updates with a 503 and Retry-After. Edge reads the file, so changing it never restarts
+Edge: the ConfigMap has a fixed name, is never included in a checksum annotation, and is mounted as a directory (not
+with subPath), so the kubelet updates the file in running pods - within a couple of minutes, plus Edge's check interval.
+*/ -}}
+{{- if and .Values.edge.enabled .Values.maintenance.edgeUpdateBlock.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "featurehub.edge.name" . }}-update-block
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  labels:
+    {{- include "featurehub.edge.labels" . | nindent 4 }}
+{{- if include "featurehub.maintenance.routesTraffic" . }}
+data:
+  blocked: {{ include "featurehub.maintenance.retryAfter" . | quote }}
+{{- else }}
+data: {}
+{{- end }}
+{{- end }}

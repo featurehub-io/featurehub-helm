@@ -80,6 +80,13 @@ spec:
                 name: {{ .Values.dacha.envFromSecret }}
             {{- end }}
           {{- end }}
+          env:
+            # the Redis fallback settings are re-read at runtime from these always-mounted files, so turning Redis
+            # on or off never changes this pod template (which would restart Dacha2 and empty its cache)
+            - name: dacha2.redis.config-file
+              value: "/etc/redis-config/redis.properties,/etc/redis-secret/redis.properties"
+            - name: dacha2.redis.config-reload-seconds
+              value: {{ .Values.redis.dacha.configReloadSeconds | quote }}
           ports:
             - name: http
               containerPort: 8600
@@ -115,6 +122,12 @@ spec:
             - mountPath: /etc/app-config
               name: app-config-empty
           {{- end }}
+            - mountPath: /etc/redis-config
+              name: redis-config
+              readOnly: true
+            - mountPath: /etc/redis-secret
+              name: redis-secret
+              readOnly: true
           {{- if .Values.dacha.extraVolumeMounts }}
             {{- toYaml .Values.dacha.extraVolumeMounts | nindent 12 }}
           {{- end }}
@@ -155,6 +168,15 @@ spec:
         - name: app-config-empty
           emptyDir: {}
       {{- end }}
+        # fixed names and no checksum annotations - see dacha/redis.yaml
+        - name: redis-config
+          configMap:
+            name: {{ include "featurehub.redis.dachaName" . }}
+            optional: true
+        - name: redis-secret
+          secret:
+            secretName: {{ include "featurehub.redis.dachaSecretName" . }}
+            optional: true
       {{- if .Values.dacha.extraVolumes }}
         {{- toYaml .Values.dacha.extraVolumes | nindent 8 }}
       {{- end }}

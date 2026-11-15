@@ -1,0 +1,21 @@
+{{- if and (include "featurehub.maintenance.responderEnabled" .) .Values.maintenance.responder.podDisruptionBudget.enabled }}
+{{- $pdb := .Values.maintenance.responder.podDisruptionBudget }}
+apiVersion: {{ .Capabilities.APIVersions.Has "policy/v1" | ternary "policy/v1" "policy/v1beta1" }}
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "featurehub.maintenanceResponder.name" . }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "22"
+  labels:
+    {{- include "featurehub.maintenanceResponder.labels" . | nindent 4 }}
+spec:
+  {{- if $pdb.minAvailable }}
+  minAvailable: {{ $pdb.minAvailable }}
+  {{- end }}
+  {{- if $pdb.maxUnavailable }}
+  maxUnavailable: {{ $pdb.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "featurehub.maintenanceResponder.selectorLabels" . | nindent 6 }}
+{{- end }}

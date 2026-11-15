@@ -1,6 +1,6 @@
 # featurehub
 
-![Version: 4.2.0](https://img.shields.io/badge/Version-4.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.10.1](https://img.shields.io/badge/AppVersion-1.10.1-informational?style=flat-square)
+![Version: 4.3.0](https://img.shields.io/badge/Version-4.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.10.1](https://img.shields.io/badge/AppVersion-1.10.1-informational?style=flat-square)
 
 FeatueHub is an Enterprise Grade, Cloud Native Feature Management platform that is available to suite any organisations requirements. This fully supported Helm chart is the Open Source version of the product, which has all the same features as the [SaaS product](https://app.featurehub.io).
 
@@ -20,6 +20,86 @@ NATS and Postgres are *NOT* requirements of the project and are included only fo
 |------------|------|---------|
 | https://nats-io.github.io/k8s/helm/charts/ | nats | 2.15.2 |
 | https://repo.helmforge.dev | postgresql | 2.1.2 |
+
+## Maintenance windows
+
+FeatureHub 1.11 and later can keep the Admin app in maintenance mode, and keep SDKs working, while the Management
+Repository (MR) is shut down, e.g. for a database upgrade. The
+[Maintenance Windows](https://docs.featurehub.io/featurehub/latest/maintenance.html) docs explain the pieces. This chart
+drives them all from `maintenance.mode`:
+
+| `maintenance.mode` | Maintenance responder | Admin (non-`/features`) ingress traffic | MR replicas | Edge feature updates |
+|---|---|---|---|---|
+| `disabled` | not deployed | MR | normal | allowed |
+| `warm` | deployed | MR | normal | allowed |
+| `active` | deployed | maintenance responder | normal | blocked (503) |
+| `shutdown` | deployed | maintenance responder | **0** | blocked (503) |
+| `post` | deployed | maintenance responder | normal | blocked (503) |
+
+`maintenance.start`, `maintenance.end` (ISO-8601 UTC timestamps ending in `Z`) and `maintenance.message` are required
+in every mode except `disabled`. Setting them while `disabled` announces the window to Admin users ahead of time.
+
+A typical window, one `helm upgrade` per step:
+
+1. A few days ahead: set `start`, `end` and `message` (MR restarts, Admin users see the upcoming notice). If you use
+   the Redis fallback (below), turn it on now.
+2. `mode: warm` and wait for the maintenance responder to be ready.
+3. `mode: active` when the window starts. Wait until every Edge logs `feature updates are now BLOCKED` (the kubelet can
+   take a minute or two to update the file), then call the publish-all on **one** MR and wait for
+   `redis: maintenance-publish-all: finished` in its log:
+   ```sh
+   kubectl port-forward <an mr pod> 8701:8701
+   curl -X POST http://localhost:8701/maintenance/publish-all
+   ```
+4. `mode: shutdown`: MR is scaled to 0. Do the database work.
+5. `mode: post`: MR starts again with the maintenance responder still taking the traffic, so you can check MR.
+6. `mode: disabled`, and clear `start`, `end` and `message` (or leave them until the end time has passed).
+
+The chart switches its own ingresses (`global.ingress` and `managementRepository.ingress`). If your ingress or load
+balancer is managed outside the chart, point its Admin routes at the `<release>-maintenance-responder` Service (port
+`8085`, the same as MR) during `active`, `shutdown` and `post`, and keep `/features` on Edge. Dacha2 keeps calling MR
+directly throughout, which is what lets it notice MR has gone and fall back to Redis.
+
+Changing the mode never restarts Edge or Dacha2. The Edge update block is a file in the fixed-name ConfigMap
+`<release>-edge-update-block`, which Edge re-checks every `maintenance.edgeUpdateBlock.checkIntervalSeconds`.
+
+### Redis fallback for Dacha2
+
+With `redis.url` set, MR writes every environment and service account to Redis, and Dacha2 reads them on a cache miss
+while MR is unavailable, so SDKs with API keys Dacha2 has not seen yet, and restarted Dacha2 pods, keep working. See
+[Serving Dacha2 cache misses from Redis](https://docs.featurehub.io/featurehub/latest/maintenance.html#_redis_fallback),
+including the Redis requirements (`maxmemory-policy noeviction`, authentication and TLS).
+
+This chart does not deploy Redis. Use your cloud's managed Redis, or another chart. Redis is only needed around a
+maintenance window, so you can create it before the window and remove it afterwards.
+
+Turn it on in two steps:
+
+1. Set `redis.url` (and `redis.password` or `redis.existingSecret`, and `redis.caCert` for a private CA) with
+   `redis.dacha.enabled: false`. MR restarts (cheap, it holds no cache) and runs a full sync. Wait for
+   `mr_redis_last_full_sync_seconds`.
+2. Set `redis.dacha.enabled: true`. Dacha2 picks this up within `redis.dacha.configReloadSeconds`, **without
+   restarting**.
+
+Turn it off in the reverse order: `redis.dacha.enabled: false` first, then remove `redis.url`, then remove Redis.
+
+Dacha2 re-reads its Redis settings from the `<release>-dacha-redis` ConfigMap and Secret, which are always mounted
+(empty while Redis is off). That is why the Dacha2 pod template does not change when Redis is turned on or off. Do not
+add anything to `dacha.podAnnotations` (or the global `podAnnotations`) that changes with the Redis settings, such as a
+checksum of those values, or Dacha2 will restart and empty its cache anyway. The same applies to Edge and the update
+block ConfigMap.
+
+If you use `redis.existingSecret`, the Secret must contain two keys: the password under `redis.existingSecretPasswordKey`
+(default `password`) for MR, and `redis.properties` for Dacha2:
+
+```sh
+kubectl create secret generic featurehub-redis \
+  --from-literal=password='<password>' \
+  --from-literal=redis.properties='dacha2.redis.password=<password>'
+```
+
+Create the Secret before setting `redis.existingSecret`. Setting or changing `redis.existingSecret` restarts Dacha2 once,
+because the mounted Secret's name is part of its pod template.
 
 ## Values
 
@@ -136,6 +216,17 @@ NATS and Postgres are *NOT* requirements of the project and are included only fo
 | googlepubsub.emulator | object | `{"enabled":true,"host":"pubsub-emulator:8075"}` | is the pubsub implementation a copy of the Docker emulator |
 | googlepubsub.enabled | bool | `false` | whether to enable chart for using Google PubSub |
 | googlepubsub.project | string | `"featurehub"` |  |
+| maintenance | object | `{"edgeUpdateBlock":{"checkIntervalSeconds":30,"enabled":true},"end":"","message":"","mode":"disabled","responder":{"affinity":{},"envFromSecret":"","environmentVars":{},"extraVolumeMounts":[],"extraVolumes":[],"image":{"repository":"featurehub/maintenance-responder","tag":""},"imagePullSecrets":[],"interceptPrefixes":"","livenessProbe":{"failureThreshold":2,"httpGet":{"path":"/health/liveness","port":"metrics"},"initialDelaySeconds":10,"periodSeconds":20,"timeoutSeconds":3},"nodeSelector":{},"podAnnotations":{},"podDisruptionBudget":{"enabled":false,"maxUnavailable":1},"podLabels":{},"podSecurityContext":{"fsGroup":999},"prometheus":{"enabled":false,"labels":{}},"pullPolicy":"IfNotPresent","readinessProbe":{"failureThreshold":2,"httpGet":{"path":"/health/readiness","port":"metrics"},"initialDelaySeconds":10,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":3},"replicaCount":1,"resources":{},"securityContext":{"runAsNonRoot":true,"runAsUser":999},"serviceAccount":{"annotations":{},"create":true,"labels":{},"name":""},"strategy":{},"tolerations":[]},"start":""}` | ----------------------------------------------------------------------------- # |
+| maintenance.edgeUpdateBlock.checkIntervalSeconds | int | `30` | How often Edge checks for the update block file |
+| maintenance.edgeUpdateBlock.enabled | bool | `true` | Mount the update block file into Edge, so it refuses feature updates (SDK/test API PUTs) with a 503 while the maintenance responder takes the traffic. The file is changed without restarting Edge. Turning this on or off restarts Edge. |
+| maintenance.end | string | `""` | The end of the window, in the same format. Also used for the Retry-After header. |
+| maintenance.message | string | `""` | The message shown to Admin app users. |
+| maintenance.mode | string | `"disabled"` | The stage of the maintenance window. Use them in this order: disabled -> warm -> active -> shutdown -> post -> disabled. `disabled`: normal operation, the maintenance responder is not deployed. `warm`: the maintenance responder is deployed but receives no traffic. `active`: all non-Edge ingress traffic goes to the maintenance responder and Edge blocks feature updates. MR is still running: call its maintenance publish-all now. `shutdown`: as active, and MR is scaled to 0 for the database work. `post`: MR is scaled back up, the maintenance responder still takes the traffic so you can check MR. |
+| maintenance.responder | object | `{"affinity":{},"envFromSecret":"","environmentVars":{},"extraVolumeMounts":[],"extraVolumes":[],"image":{"repository":"featurehub/maintenance-responder","tag":""},"imagePullSecrets":[],"interceptPrefixes":"","livenessProbe":{"failureThreshold":2,"httpGet":{"path":"/health/liveness","port":"metrics"},"initialDelaySeconds":10,"periodSeconds":20,"timeoutSeconds":3},"nodeSelector":{},"podAnnotations":{},"podDisruptionBudget":{"enabled":false,"maxUnavailable":1},"podLabels":{},"podSecurityContext":{"fsGroup":999},"prometheus":{"enabled":false,"labels":{}},"pullPolicy":"IfNotPresent","readinessProbe":{"failureThreshold":2,"httpGet":{"path":"/health/readiness","port":"metrics"},"initialDelaySeconds":10,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":3},"replicaCount":1,"resources":{},"securityContext":{"runAsNonRoot":true,"runAsUser":999},"serviceAccount":{"annotations":{},"create":true,"labels":{},"name":""},"strategy":{},"tolerations":[]}` | The maintenance responder stands in for MR: it serves the Admin app and answers the API with a 503 and Retry-After. It is deployed in every mode except `disabled`, and never connects to the database or the messaging layer. |
+| maintenance.responder.envFromSecret | string | `""` | Name of an existing secret whose keys are exposed as environment variables |
+| maintenance.responder.environmentVars | object | `{}` | Extra environment variables for the maintenance responder, e.g. CORS settings |
+| maintenance.responder.interceptPrefixes | string | `""` | Comma-separated path prefixes that get a 503. Empty uses the image default (mr-api,saml,oauth,dacha2,info). |
+| maintenance.start | string | `""` | The start of the window, an ISO-8601 UTC timestamp ending in Z, e.g. 2026-11-17T10:15:30Z. Setting start, end and message while the mode is `disabled` announces the window to Admin app users ahead of time (and restarts MR). All three are required in any other mode. |
 | managementRepository.affinity | object | `{}` |  |
 | managementRepository.enabled | bool | `true` | do you want to run the Management Repository? |
 | managementRepository.envAsApplicationProperties | bool | `true` | If `true`, entries from `environmentVars` will be mapped to /etc/app-config/application.properties file To mount secret settings as /etc/app-config/application.properties see volume fields Used for retrocompatiblity with FeatureHub controller versions lower than 1.5.0 https://docs.featurehub.io/featurehub/latest/installation.html#_run_configuration |
@@ -185,3 +276,14 @@ NATS and Postgres are *NOT* requirements of the project and are included only fo
 | nats | object | `{"config":{"cluster":{"enabled":true,"name":"featurehub","replicas":3}},"enabled":true}` | ----------------------------------------------------------------------------- # |
 | podAnnotations | object | `{}` |  |
 | postgresql | object | `{"auth":{"database":"featurehub","password":"featurehub","postgresPassword":"postgresql","username":"featurehub"},"enabled":true,"standalone":{"persistence":{"accessModes":["ReadWriteOnce"],"enabled":true,"size":"128Mi","storageClass":"standard"}}}` | ----------------------------------------------------------------------------- # |
+| redis | object | `{"caCert":"","dacha":{"configReloadSeconds":30,"enabled":true},"existingSecret":"","existingSecretPasswordKey":"password","keyPrefix":"","managementRepository":{"enabled":true},"mode":"standalone","password":"","sentinelMaster":"","url":"","username":""}` | ----------------------------------------------------------------------------- # |
+| redis.caCert | string | `""` | The PEM CA certificate(s) to trust for rediss://, if the server is not signed by a public CA |
+| redis.dacha.configReloadSeconds | int | `30` | How often Dacha2 re-reads its Redis settings |
+| redis.dacha.enabled | bool | `true` | Turn the Redis fallback on for Dacha2 when url is set. Dacha2 picks this up without restarting. Enable MR first, wait for its full sync (`mr_redis_last_full_sync_seconds`), then enable Dacha2. |
+| redis.existingSecret | string | `""` | The name of a Secret you created, instead of `password`. It needs the key `existingSecretPasswordKey` (for MR) AND a `redis.properties` key for Dacha2 containing `dacha2.redis.password=<the password>`, because Dacha2 re-reads its Redis settings from files at runtime. The Secret is always mounted into Dacha2, so create it before setting this (setting or changing this restarts Dacha2 once). |
+| redis.keyPrefix | string | `""` | Empty uses the default prefix (`featurehub`). Use a different prefix for each FeatureHub install sharing one Redis. |
+| redis.managementRepository.enabled | bool | `true` | Turn Redis on for MR when url is set. Changing any redis setting restarts MR, which is cheap as MR holds no cache. |
+| redis.mode | string | `"standalone"` | standalone, sentinel or cluster. For sentinel and cluster, list several host:port pairs separated by commas in the url. |
+| redis.password | string | `""` | The Redis password. The chart puts it in a Secret. Use this or `existingSecret`. |
+| redis.sentinelMaster | string | `""` | The master name, required for sentinel mode |
+| redis.url | string | `""` | Enables the Redis fallback, e.g. `redis://redis:6379` or `rediss://10.0.0.3:6378` (TLS). Do not put the password in the url, use `password` or `existingSecret`. |

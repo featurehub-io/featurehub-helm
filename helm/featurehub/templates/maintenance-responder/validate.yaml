@@ -1,0 +1,2 @@
+{{- /* renders nothing: fails the install/upgrade if the maintenance or redis values are invalid */ -}}
+{{- include "featurehub.maintenance.validate" . -}}

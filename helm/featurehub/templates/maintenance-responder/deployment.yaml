@@ -1,0 +1,128 @@
+{{- if include "featurehub.maintenance.responderEnabled" . }}
+{{- $r := .Values.maintenance.responder }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "featurehub.maintenanceResponder.name" . }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
+  labels:
+    {{- include "featurehub.maintenanceResponder.labels" . | nindent 4 }}
+spec:
+  replicas: {{ $r.replicaCount }}
+  {{- with $r.strategy }}
+  strategy:
+    {{- . | toYaml | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "featurehub.maintenanceResponder.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- if gt ( len .Values.global.extraCommonConfigFiles ) 0 }}
+        checksum/global-common-config-extra: {{ include (print $.Template.BasePath "/common/configmap-global-common-config-extra.yaml") . | sha256sum }}
+        {{- end }}
+        {{- range $key, $value := $r.podAnnotations }}
+        {{ $key | quote }}: {{ $value | quote }}
+        {{- end }}
+        {{- range $key, $value := .Values.podAnnotations }}
+        {{ $key | quote }}: {{ $value | quote }}
+        {{- end }}
+      labels:
+        {{- include "featurehub.maintenanceResponder.selectorLabels" . | nindent 8 }}
+        {{- include "featurehub.podlabels" $r.podLabels | nindent 8 }}
+        {{- include "featurehub.globalPodlabels" . | nindent 8 }}
+    spec:
+      {{- with $r.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "featurehub.maintenanceResponder.serviceAccountName" . }}
+      {{- with $r.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "featurehub.maintenanceResponder.name" . }}
+          {{- with $r.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ $r.image.repository }}:{{ $r.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ $r.pullPolicy }}
+          {{- if $r.envFromSecret }}
+          envFrom:
+            - secretRef:
+                name: {{ $r.envFromSecret }}
+          {{- end }}
+          env:
+            # the same ports as MR, so the ingress can switch between them
+            - name: server.port
+              value: "8085"
+            - name: monitor.port
+              value: "8701"
+            # serve the Admin app, so users get the maintenance page
+            - name: run.nginx
+              value: "true"
+            {{- if $r.interceptPrefixes }}
+            - name: interceptPrefixes
+              value: {{ $r.interceptPrefixes | quote }}
+            {{- end }}
+            {{- if .Values.global.intranet }}
+            - name: web.asset.location
+              value: "/var/www/html/intranet"
+            {{- end }}
+            {{- if ne .Values.global.urlPath "" }}
+            - name: featurehub.url-path
+              value: {{ .Values.global.urlPath | quote }}
+            {{- end }}
+            {{- include "featurehub.maintenance.envs" . | nindent 12 }}
+            {{- range $key, $value := $r.environmentVars }}
+            - name: {{ $key | quote }}
+              value: {{ $value | quote }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: 8085
+              protocol: TCP
+            - name: metrics
+              containerPort: 8701
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml $r.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml $r.readinessProbe | nindent 12 }}
+          volumeMounts:
+          {{- range $cm := .Values.global.extraCommonConfigFiles }}
+            - name: {{ $cm.configMapSuffix }}
+              mountPath: "/etc/common-config/{{ $cm.fileName }}"
+              subPath: {{ $cm.fileName | quote }}
+          {{- end }}
+          {{- with $r.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml $r.resources | nindent 12 }}
+      volumes:
+      {{- range $cm := .Values.global.extraCommonConfigFiles }}
+        - name: {{ $cm.configMapSuffix }}
+          configMap:
+            name: {{ include "featurehub.fullname" $ }}-global-extra-{{ $cm.configMapSuffix }}
+      {{- end }}
+      {{- with $r.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $r.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $r.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $r.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
